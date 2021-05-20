@@ -16,6 +16,11 @@ public Object recoverFromMismatchedSet (IntStream input,
         reportError(e);
         throw e;
 }
+public Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow)
+        throws RecognitionException
+{
+        throw new MismatchedTokenException(ttype, input);
+}
 }
 
 @rulecatch {
@@ -35,7 +40,7 @@ function: functionDecl functionBody
 functionDecl: compoundType id '(' formalParameters? ')'
 	;
 
-formalParameters : varDecl (',' varDecl)*
+formalParameters : compoundType id (',' compoundType id)*
         ;
 
 functionBody: '{' varDecl* statement* '}'
@@ -49,26 +54,23 @@ block   : '{' statement* '}'
 
 /* Statements */
 
-statement : 
-        statEmpty
-        | statIf
-        | statWhile
-        | statPrint
-        | statPrintln
-        | statReturn
-        | statAssn
-        | statExpr
-        ;
+statement       : 
+                statEmpty
+                | statIf
+                | statWhile
+                | statPrint
+                | statPrintln
+                | statReturn
+                | (id '=')=> statAssn
+                | (arrayAccess '=')=> statArrAssn
+                | statExpr
+                ;
 
 statEmpty       : ';'
                 ;
 
-statExpr        : expr ';'
+statIf          : IF '(' expr ')' block (ELSE block)?
                 ;
-
-statIf  :
-        IF '(' expr ')' block (ELSE block)?
-        ;
 
 statWhile       : WHILE '(' expr ')' block
                 ;
@@ -82,13 +84,16 @@ statPrintln     : PRINTLN expr ';'
 statReturn      : RETURN expr? ';'
                 ;
 
-statAssn        : ((id '[' expr ']' '=' expr) | (id '=' expr)) ';'
+statArrAssn     : arrayAccess '=' expr ';'
+                ;
+
+statAssn        : id '=' expr ';'
+                ;
+
+statExpr        : expr ';'
                 ;
 
 /* Expressions */
-
-exprList        : expr (',' expr)*
-                ;
 
 expr            : exprEqualTo
 	        ;
@@ -96,33 +101,34 @@ expr            : exprEqualTo
 exprEqualTo     : exprLessThan ('==' exprLessThan)*
                 ;
 
-exprLessThan
-	:	 exprAddSub ('<' exprAddSub)*
+exprLessThan    : exprAddSub ('<' exprAddSub)*
                 ;
 
-exprAddSub
-	:	 exprMult (('+'|'-') exprMult)*
+exprAddSub      : exprMult (('+'|'-') exprMult)*
                 ;
 
-exprMult :	 atom ('*' atom)*
-	;
+exprMult        : atom ('*' atom)*
+	        ;
 
-atom  :
-        id
+atom    :
+        (id '[')=> arrayAccess
+        | (id '(')=> call
+        | id
         | literal
         | '(' expr ')'
+        ;
+
+arrayAccess     : id '[' expr ']'
+                ;
+
+call    : id '(' exprList* ')'
         ;
 
 id      : ID
         ;
 
-op      : 
-        OP_EQUAL_TO
-        | OP_LESS_THAN
-        | OP_ADD
-        | OP_SUB
-        | OP_MULT
-        ;
+exprList        : expr (',' expr)*
+                ;
 
 literal : CONST_INT | CONST_CHAR | CONST_STRING | CONST_FLOAT | TRUE | FALSE
         ;
@@ -249,7 +255,7 @@ CONST_STRING    : '"'  STR_CHARS* '"'
 CONST_CHAR      : '\'' STR_CHARS '\''
         ;
 
-fragment STR_CHARS : ('A'..'Z' | 'a'..'z' | '0'..'9' | '!' | ',' | '.' | ':' | '_' | '{' | '}' | ' ' ) { $channel = HIDDEN;}
+fragment STR_CHARS : ('A'..'Z' | 'a'..'z' | '0'..'9' | '!' | ',' | '.' | ':' | '_' | '{' | '}' | ' ' )
         ;
 
 CONST_FLOAT     : ('0'..'9')+'.'('0'..'9')+('('('0'..'9')+')')?
