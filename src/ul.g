@@ -1,5 +1,6 @@
 grammar ul;
-				
+
+
 @members
 {
 protected void mismatch (IntStream input, int ttype, BitSet follow)
@@ -24,14 +25,6 @@ public Object recoverFromMismatchedSet (IntStream input,
         }
 }
 
-/*
- * This is a subset of the ulGrammar to show you how
- * to make new production rules.
- * You will need to:
- *  - change type to be compoundType and include appropriate productions
- *  - introduce optional formalParameters
- *  - change functionBody to include variable declarations and statements 
- */
 
 program : function+ EOF
 	;
@@ -39,41 +32,235 @@ program : function+ EOF
 function: functionDecl functionBody
 	;
 
-functionDecl: type identifier '(' ')'
+functionDecl: compoundType id '(' formalParameters? ')'
 	;
 
-functionBody: '{' '}'
+formalParameters : varDecl (',' varDecl)*
+        ;
+
+functionBody: '{' varDecl* statement* '}'
 	;
 
-identifier : ID
+varDecl : compoundType id ';'
+        ;
+
+block   : '{' statement* '}'
+        ;
+
+/* Statements */
+
+statement : 
+        statEmpty
+        | statIf
+        | statWhile
+        | statPrint
+        | statPrintln
+        | statReturn
+        | statAssn
+        | statExpr
+        ;
+
+statEmpty       : ';'
+                ;
+
+statExpr        : expr ';'
+                ;
+
+statIf  :
+        IF '(' expr ')' block (ELSE block)?
+        ;
+
+statWhile       : WHILE '(' expr ')' block
+                ;
+
+statPrint       : PRINT expr ';'
+                ;
+
+statPrintln     : PRINTLN expr ';'
+                ;
+
+statReturn      : RETURN expr? ';'
+                ;
+
+statAssn        : ((id '[' expr ']' '=' expr) | (id '=' expr)) ';'
+                ;
+
+/* Expressions */
+
+exprList        : expr (',' expr)*
+                ;
+
+expr            : exprEqualTo
+	        ;
+
+exprEqualTo     : exprLessThan ('==' exprLessThan)*
+                ;
+
+exprLessThan
+	:	 exprAddSub ('<' exprAddSub)*
+                ;
+
+exprAddSub
+	:	 exprMult (('+'|'-') exprMult)*
+                ;
+
+exprMult :	 atom ('*' atom)*
 	;
 
-type:	TYPE
+atom  :
+        id
+        | literal
+        | '(' expr ')'
+        ;
+
+id      : ID
+        ;
+
+op      : 
+        OP_EQUAL_TO
+        | OP_LESS_THAN
+        | OP_ADD
+        | OP_SUB
+        | OP_MULT
+        ;
+
+literal : CONST_INT | CONST_CHAR | CONST_STRING | CONST_FLOAT | TRUE | FALSE
+        ;
+
+type:	TYPE_INT | TYPE_FLOAT | TYPE_CHAR | TYPE_STRING | TYPE_BOOL | TYPE_VOID
 	;
 
-/* Lexer */
-	 
+compoundType : type '[' CONST_INT ']'
+        | type
+        ;
+
+/*
+ * #       ###### #    # ###### #####  
+ * #       #       #  #  #      #    # 
+ * #       #####    ##   #####  #    # 
+ * #       #        ##   #      #####  
+ * #       #       #  #  #      #   #  
+ * ####### ###### #    # ###### #    # 
+ */
+
+/* Keywords */
+
+TYPE_INT        : 'int'
+	;
+
+TYPE_FLOAT      : 'float'
+	;
+
+TYPE_CHAR       : 'char'
+	;
+
+TYPE_STRING     : 'string'
+	;
+
+TYPE_BOOL       : 'boolean'
+	;
+
+TYPE_VOID       : 'void'
+	;
+
 IF	: 'if'
 	;
 
-/* Fixme: add the other types here */
-TYPE	: 'int'
-	;
-/*
- * FIXME:
- * Change this to match the specification for identifier
- * 
- */
-ID	: ('a'..'z')+ 
+ELSE	: 'else'
 	;
 
-/* These two lines match whitespace and comments 
- * and ignore them.
- * You want to leave these as last in the file.  
- * Add new lexical rules above 
- */
+WHILE	: 'while'
+	;
+
+PRINT	: 'print'
+	;
+
+PRINTLN	: 'println'
+	;
+
+RETURN	: 'return'
+	;
+
+TRUE	: 'true'
+	;
+
+FALSE	: 'false'
+	;
+
+/* Punctuation */
+
+BRACE_OPEN      : '{'
+        ;
+
+BRACE_CLOSE     : '}'
+        ;
+
+BRACKET_OPEN    : '['
+        ;
+
+BRACKET_CLOSE   : ']'
+        ;
+
+PAREN_OPEN      : '('
+        ;
+
+PAREN_CLOSE     : ')'
+        ;
+
+COMMA	        : ','
+	;
+
+SEMICOLON       : ';'
+	;
+
+/* Identifiers */
+
+ID      : ('a'..'z' | 'A'..'Z' | '_')('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*
+	;
+
+/* Binary operators */
+
+OP_EQUAL_TO     : '=='
+	;
+
+OP_LESS_THAN    : '<'
+	;
+
+OP_ADD          : '+'
+        ;
+
+OP_SUB          : '-'
+        ;
+
+OP_MULT         : '*'
+        ;
+
+OP_ASSIGN       : '='
+        ;
+
+/* Constant values */
+
+CONST_INT       : '-'? ('0' | ('1'..'9'('0'..'9')*))
+        ;
+
+CONST_STRING    : '"'  STR_CHARS* '"'
+        ;
+
+CONST_CHAR      : '\'' STR_CHARS '\''
+        ;
+
+fragment STR_CHARS : ('A'..'Z' | 'a'..'z' | '0'..'9' | '!' | ',' | '.' | ':' | '_' | '{' | '}' | ' ' ) { $channel = HIDDEN;}
+        ;
+
+CONST_FLOAT     : ('0'..'9')+'.'('0'..'9')+('('('0'..'9')+')')?
+        ;
+
+/* Whitespace */
+
 WS      : ( '\t' | ' ' | ('\r' | '\n') )+ { $channel = HIDDEN;}
         ;
+
+/* Comments */
 
 COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n') { $channel = HIDDEN;}
         ;
