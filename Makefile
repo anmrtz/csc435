@@ -13,7 +13,7 @@ compiler:
 .PHONY: test
 
 test:
-	cd ./test; ./ul_test.sh
+	cd ./test; ./ul-test.sh
 
 clean:
 	rm ./src/$(GNAME)*.java ./src/$(GNAME).tokens
