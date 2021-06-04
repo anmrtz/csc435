@@ -1,19 +1,17 @@
 package ast;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class Function extends ASTNode {
 
     public FunctionDecl fd;
     public FunctionBody fb;
 
-    public LinkedList<VarDecl> funcVars = new LinkedList<VarDecl>();
+    public ArrayList<VarDecl> funcVars = new ArrayList<VarDecl>();
 
     public Function(FunctionDecl fd, FunctionBody fb) {
         this.fd = fd;
         this.fb = fb;
-
-        funcVars.addAll(fd.funcParams);
     }
 
     @Override

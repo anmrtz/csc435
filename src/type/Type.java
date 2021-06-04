@@ -1,7 +1,5 @@
 package type;
 
-import ast.*;
-
 public class Type {
 
     static public enum TypeID {
@@ -19,4 +17,23 @@ public class Type {
         this.typeID = typeID;
     }
 
+    @Override
+    public String toString() {
+        switch (typeID) {
+            case INT:
+                return "int";
+            case FLOAT:
+                return "float";
+            case CHAR:
+                return "char";
+            case STRING:
+                return "string";
+            case BOOL:
+                return "bool";
+            case VOID:
+                return "void";
+            default:
+                return "";
+        }
+    }
 }

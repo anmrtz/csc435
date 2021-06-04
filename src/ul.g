@@ -4,7 +4,7 @@ grammar ul;
 {
 import ast.*;
 import type.*;
-import java.util.LinkedList;
+import java.util.ArrayList;
 }
 
 @members
@@ -56,10 +56,10 @@ functionDecl returns [FunctionDecl fd]
         {fd = new FunctionDecl(tp, vId, params);}
 	;
 
-formalParameters returns [List<VarDecl> params]
+formalParameters returns [ArrayList<VarDecl> params]
 @init
 {
-	params = new LinkedList<VarDecl>();
+	params = new ArrayList<VarDecl>();
 }
         : fp = varDecl {params.add(fp);} (',' fp2 = varDecl {params.add(fp2);})*
         ;
@@ -152,9 +152,9 @@ arrayAccess     : id '[' expr ']'
 call    : id '(' exprList* ')'
         ;
 
-id      returns [Identifier id]
+id      returns [String id]
         : name = ID
-        {id = new Identifier(name.getText());}
+        {id = new String(name.getText());}
         ;
 
 exprList        : expr (',' expr)*

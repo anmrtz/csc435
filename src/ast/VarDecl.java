@@ -4,12 +4,12 @@ import type.*;
 
 public class VarDecl extends ASTNode {
 
-    public Type tp;
-    public Identifier varId;
+    public Type varType;
+    public String varName;
 
-    public VarDecl(Type tp, Identifier id) {
-        this.tp = tp;
-        varId = id;
+    public VarDecl(Type tp, String id) {
+        varType = tp;
+        varName = id;
     }
 
     @Override

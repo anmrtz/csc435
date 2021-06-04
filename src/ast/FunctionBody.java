@@ -1,11 +1,11 @@
 package ast;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class FunctionBody extends ASTNode {
 
-    public LinkedList<VarDecl> funcVars = new LinkedList<VarDecl>();
-    public LinkedList<Statement> funcStats = new LinkedList<Statement>();;
+    public ArrayList<VarDecl> funcVars = new ArrayList<VarDecl>();
+    public ArrayList<Statement> funcStats = new ArrayList<Statement>();;
 
     public FunctionBody() {
     }

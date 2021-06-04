@@ -1,10 +1,10 @@
 package ast;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class Program extends ASTNode {
 
-    public LinkedList<Function> progFuncs = new LinkedList<Function>();
+    public ArrayList<Function> progFuncs = new ArrayList<Function>();
 
     public Program() {
     }
