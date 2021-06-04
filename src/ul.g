@@ -1,5 +1,11 @@
 grammar ul;
 
+@header
+{
+import ast.*;
+import type.*;
+import java.util.LinkedList;
+}
 
 @members
 {
@@ -31,30 +37,52 @@ public Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet foll
 }
 
 
-program : function+ EOF
+program returns [Program p] 
+@init
+{
+	// executed before the method starts
+	p = new Program();
+}
+        : (f = function {p.addFunction(f);})+ EOF
 	;
 
-function: functionDecl functionBody
+function returns [Function f]
+        : fd = functionDecl fb = functionBody
+        {f = new Function(fd, fb);}
 	;
 
-functionDecl: compoundType id '(' formalParameters? ')'
+functionDecl returns [FunctionDecl fd]
+        : tp = compoundType vId = id '(' (params = formalParameters)? ')'
+        {fd = new FunctionDecl(tp, vId, params);}
 	;
 
-formalParameters : compoundType id (',' compoundType id)*
+formalParameters returns [List<VarDecl> params]
+@init
+{
+	params = new LinkedList<VarDecl>();
+}
+        : fp = varDecl {params.add(fp);} (',' fp2 = varDecl {params.add(fp2);})*
         ;
 
-functionBody: '{' varDecl* statement* '}'
+functionBody returns [FunctionBody fb]
+@init
+{
+	fb = new FunctionBody();
+}
+        : '{' (vd = varDecl {fb.addVarDecl(vd);} ';')* (st = statement {fb.addStatement(st);})* '}'
 	;
 
-varDecl : compoundType id ';'
+varDecl returns [VarDecl vd]
+        : tp = compoundType vId = id    
+        {vd = new VarDecl(tp, vId);}    
         ;
 
 block   : '{' statement* '}'
         ;
 
 /* Statements */
-
-statement       : 
+statement returns [Statement s] 
+        : 
                 statEmpty
                 | statIf
                 | statWhile
@@ -124,20 +152,56 @@ arrayAccess     : id '[' expr ']'
 call    : id '(' exprList* ')'
         ;
 
-id      : ID
+id      returns [Identifier id]
+        : name = ID
+        {id = new Identifier(name.getText());}
         ;
 
 exprList        : expr (',' expr)*
                 ;
 
-literal : CONST_INT | CONST_CHAR | CONST_STRING | CONST_FLOAT | TRUE | FALSE
+literal returns [Literal l]
+        : val = CONST_INT 
+                {
+                        int i = Integer.parseInt(val.getText());
+                        l = new Literal<Integer>(Integer.class, i);
+                }
+        | val = CONST_CHAR 
+                {
+                        char c = val.getText().charAt(0);
+                        l = new Literal<Character>(Character.class, c);
+                }
+        | val = CONST_STRING 
+                {
+                        l = new Literal<String>(String.class, val.getText());
+                }
+        | val = CONST_FLOAT 
+                {
+                        float f = Float.parseFloat(val.getText());
+                        l = new Literal<Float>(Float.class, f);
+                }
+        | val = TRUE 
+                {
+                        l = new Literal<Boolean>(Boolean.class, true);
+                }
+        | val = FALSE
+                {
+                        l = new Literal<Boolean>(Boolean.class, false);
+                }
         ;
 
-type:	TYPE_INT | TYPE_FLOAT | TYPE_CHAR | TYPE_STRING | TYPE_BOOL | TYPE_VOID
+type returns [Type t]
+        : TYPE_INT {t = new Type(Type.TypeID.INT);} 
+        | TYPE_FLOAT {t = new Type(Type.TypeID.FLOAT);} 
+        | TYPE_CHAR {t = new Type(Type.TypeID.STRING);}
+        | TYPE_STRING {t = new Type(Type.TypeID.STRING);}
+        | TYPE_BOOL {t = new Type(Type.TypeID.BOOL);}
+        | TYPE_VOID {t = new Type(Type.TypeID.VOID);}
 	;
 
-compoundType : type '[' CONST_INT ']'
-        | type
+compoundType returns [Type t]
+        : tp = type '[' sz = CONST_INT ']' {t = new TypeArr(tp.typeID, Integer.parseInt(sz.getText()));}
+        | tp = type {t = tp;}
         ;
 
 /*

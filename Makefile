@@ -8,7 +8,7 @@ grammar: $(GSRCS)
 	java org.antlr.Tool -fo ./src/ ./src/$(GSRC) 
 
 compiler:
-	javac ./src/*.java -d ./build
+	javac ./src/*.java ./src/*/*.java -d ./build
 
 .PHONY: test
 
@@ -18,3 +18,4 @@ test:
 clean:
 	rm ./src/$(GNAME)*.java ./src/$(GNAME).tokens
 	rm -r ./build
+	rm -r ./src/output

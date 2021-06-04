@@ -1,12 +1,6 @@
-/*
- * Compiler.java
- *
- * A starting place for the unnamed language compiler for CSC 435/535
- *
- */
-
 import org.antlr.runtime.*;
 import java.io.*;
+import ast.*;
 
 public class Compiler {
 	public static void main (String[] args) throws Exception {
@@ -26,13 +20,12 @@ public class Compiler {
 		ulParser parser = new ulParser(tokens);
 
 		try {
-			parser.program();
+			Program p = parser.program();
+		
+			PrettyPrintVisitor pv = new PrettyPrintVisitor();
+			p.accept(pv);
 		}
 		catch (RecognitionException e )	{
-			// A lexical or parsing error occured.
-			// ANTLR will have already printed information on the
-			// console due to code added to the grammar.  So there is
-			// nothing to do here.
 			System.exit(1);
 		}
 		catch (Exception e) {
