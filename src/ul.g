@@ -227,7 +227,7 @@ exprList returns [ExprList el]
 {
         el = new ExprList();
 }
-        : e = expr {el.addExpr(e);} (',' e2 = expr {el.addExpr(e2);})*
+        : (e = expr {el.addExpr(e);} (',' e2 = expr {el.addExpr(e2);})*)?
         ;
 
 literal returns [ExprLiteral l]
@@ -380,7 +380,7 @@ OP_ASSIGN       : '='
 
 /* Constant values */
 
-CONST_INT       : '-'? ('0' | ('1'..'9'('0'..'9')*))
+CONST_INT       : ('0'..'9')+
         ;
 
 CONST_STRING    : '"'  STR_CHARS* '"'
@@ -402,5 +402,5 @@ WS      : ( '\t' | ' ' | ('\r' | '\n') )+ { $channel = HIDDEN;}
 
 /* Comments */
 
-COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n') { $channel = HIDDEN;}
+COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n' | EOF) { $channel = HIDDEN;}
         ;
