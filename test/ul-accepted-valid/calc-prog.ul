@@ -1,0 +1,89 @@
+
+int sub(int l, int r) {
+    return (l - r);
+}
+
+int add(int l, int r) {
+    return (l + r);
+}
+
+int mult(int l, int r) {
+    return (l * r);
+}
+
+boolean isEqual(int l, int r) {
+    return (l == r);
+}
+
+boolean isLessThan(int l, int r) {
+    return (l < r);
+}
+
+void printFibonacci(int n) {
+    int i;
+    int[3] f;
+
+    f[0] = 1;
+    f[1] = 2;
+
+    i = 2;
+
+    while (i < n) {
+        f[i] = f[i-1] + f[1-2];
+        println f[i];
+
+        f[i - 2] = f[i - 1];
+        f[i - 1] = f[i];
+        
+        i = i + 1;
+    }
+}
+
+boolean isSeven(int i) {
+    if (i == 7) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void main() {
+    int i;
+    int j;
+    string title;
+
+    i = 2;
+    j = 1;
+
+    title = "Calculator program";
+
+    println title;
+
+    print "Operands: ";
+    print i; print ", "; println j;
+
+    print "Sum: ";
+    println add(i,j);
+
+    print "Diff: ";
+    println sub(i,j);
+
+    print "Mult: ";
+    println mult(i,j);
+
+    print "Is equal: ";
+    println isEqual(i,j);
+
+    print "Is less than: ";
+    println isLessThan(i,j);
+
+    print "Is 2 equal to 7: ";
+    println isSeven(2);
+
+    print "Is 7 equal to 7: ";
+    println isSeven(7);
+
+    i = 6;
+    print "Fibonacci sequence for n "; print i; println ':';
+    printFibonacci(i);
+}

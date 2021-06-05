@@ -1,0 +1,23 @@
+int foo() {
+    return 3;
+}
+
+int bar(int i) {
+    return i;
+}
+
+char bar2(char[3] arr) {
+    return arr[2];
+}
+
+void main() {
+    int i;
+    char c;
+    char[3] str;
+
+    i = foo();
+    i = bar(foo());
+
+    c[2] = 'a';
+    c = bar2(str);
+}

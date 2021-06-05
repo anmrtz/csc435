@@ -1,0 +1,13 @@
+void foo1() {}
+
+void foo2(int i) {}
+
+void foo3(int[3] arr) {}
+
+int bar1() {}
+
+int bar2(int i, char c) {}
+
+string bar3(int t, string[2] arr, char c) {}
+
+void main() {}

@@ -5,7 +5,7 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 echo "Testing valid .ul files for acceptance"
-for f in ./ul_accept/*.ul; do
+for f in ./ul-accepted-valid/*.ul; do
     echo "Testing $f file... "
     java -cp "/usr/share/java/antlr3-runtime.jar:../build" Compiler $f
     if [ $? -eq 0 ]
@@ -17,7 +17,7 @@ for f in ./ul_accept/*.ul; do
 done
 
 echo -e "\nTesting invalid .ul files for rejection"
-for f in ./ul_reject/*.ul; do
+for f in ./ul-rejected/*.ul; do
     echo -n "Testing $f file... "
     java -cp "/usr/share/java/antlr3-runtime.jar:../build" Compiler $f 
     if [ $? -ne 0 ]

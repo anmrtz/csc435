@@ -1,0 +1,17 @@
+int foo() {
+    return 3;
+}
+
+int bar1() {
+    return 3*3;
+}
+
+int bar2() {
+    int i;
+    i = 3;
+
+    return i;
+}
+
+void main() {
+}
