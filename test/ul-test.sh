@@ -12,7 +12,7 @@ for f in ./ul-accepted-valid/*.ul; do
     then
         echo -e "${GREEN}PASS${NC}"
     else
-        echo -e "${RED}FAIL${NC}"
+        echo -e "${RED}FAIL - Valid file not accepted${NC}"
     fi
 done
 
@@ -24,6 +24,6 @@ for f in ./ul-rejected/*.ul; do
     then
         echo -e "${GREEN}PASS${NC}"
     else
-        echo -e "${RED}FAIL${NC}"
+        echo -e "${RED}FAIL - Invalid file accepted${NC}"
     fi
 done
