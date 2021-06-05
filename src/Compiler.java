@@ -22,7 +22,7 @@ public class Compiler {
 		try {
 			Program p = parser.program();
 		
-			PrettyPrintVisitor pv = new PrettyPrintVisitor();
+			PrintVisitor pv = new PrintVisitor();
 			p.accept(pv);
 		}
 		catch (RecognitionException e )	{

@@ -5,9 +5,9 @@ import type.*;
 public class VarDecl extends ASTNode {
 
     public Type varType;
-    public String varName;
+    public ExprIden varName;
 
-    public VarDecl(Type tp, String id) {
+    public VarDecl(Type tp, ExprIden id) {
         varType = tp;
         varName = id;
     }

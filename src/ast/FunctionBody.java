@@ -5,16 +5,13 @@ import java.util.ArrayList;
 public class FunctionBody extends ASTNode {
 
     public ArrayList<VarDecl> funcVars = new ArrayList<VarDecl>();
-    public ArrayList<Statement> funcStats = new ArrayList<Statement>();;
-
-    public FunctionBody() {
-    }
+    public ArrayList<Stat> funcStats = new ArrayList<Stat>();;
 
     public void addVarDecl(VarDecl vd) {
         funcVars.add(vd);
     }
 
-    public void addStatement(Statement st) {
+    public void addStatement(Stat st) {
         funcStats.add(st);
     }
 
