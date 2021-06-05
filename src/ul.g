@@ -1,5 +1,11 @@
 grammar ul;
 
+@header
+{
+import ast.*;
+import type.*;
+import java.util.ArrayList;
+}
 
 @members
 {
@@ -31,113 +37,241 @@ public Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet foll
 }
 
 
-program : function+ EOF
+program returns [Program p] 
+@init
+{
+	// executed before the method starts
+	p = new Program();
+}
+        : (f = function {p.addFunction(f);})+ EOF
 	;
 
-function: functionDecl functionBody
+function returns [Function f]
+        : fd = functionDecl fb = functionBody
+        {f = new Function(fd, fb);}
 	;
 
-functionDecl: compoundType id '(' formalParameters? ')'
+functionDecl returns [FunctionDecl fd]
+        : tp = compoundType vId = id '(' (params = formalParameters)? ')'
+        {fd = new FunctionDecl(tp, vId, params);}
 	;
 
-formalParameters : compoundType id (',' compoundType id)*
+formalParameters returns [ArrayList<VarDecl> params]
+@init
+{
+	params = new ArrayList<VarDecl>();
+}
+        : fp = varDecl {params.add(fp);} (',' fp2 = varDecl {params.add(fp2);})*
         ;
 
-functionBody: '{' varDecl* statement* '}'
+functionBody returns [FunctionBody fb]
+@init
+{
+	fb = new FunctionBody();
+}
+        : '{' (vd = varDecl {fb.addVarDecl(vd);} ';')* (st = statement {fb.addStatement(st);})* '}'
 	;
 
-varDecl : compoundType id ';'
+varDecl returns [VarDecl vd]
+        : tp = compoundType vId = id    
+        {vd = new VarDecl(tp, vId);}    
         ;
 
-block   : '{' statement* '}'
+block returns [Block b]
+@init
+{
+        b = new Block();
+}
+        : '{' (st = statement {b.addStatement(st);})* '}'
         ;
 
 /* Statements */
-
-statement       : 
-                statEmpty
-                | statIf
-                | statWhile
-                | statPrint
-                | statPrintln
-                | statReturn
-                | (id '=')=> statAssn
-                | (arrayAccess '=')=> statArrAssn
-                | statExpr
-                ;
+statement returns [Stat st] 
+        : statEmpty {st = new Stat();}
+        | si = statIf {st = si;}
+        | sw = statWhile {st = sw;}
+        | sp = statPrint {st = sp;}
+        | spl = statPrintln {st = spl;}
+        | sr = statReturn {st = sr;}
+        | (id '=')=> sa = statAssn {st = sa;}
+        | (arrayAccess '=')=> saa = statArrAssn {st = saa;}
+        | se = statExpr {st = se;}
+        ;
 
 statEmpty       : ';'
                 ;
 
-statIf          : IF '(' expr ')' block (ELSE block)?
-                ;
+statIf returns [StatIf st]         
+        : IF '(' condEx = expr ')' ifBlk = block (ELSE elseBlk = block)?
+        {st = new StatIf(condEx, ifBlk, elseBlk);}
+        ;
 
-statWhile       : WHILE '(' expr ')' block
-                ;
+statWhile returns [StatWhile st]     
+        : WHILE '(' condEx = expr ')' blk = block
+        {st = new StatWhile(condEx, blk);}
+        ;
 
-statPrint       : PRINT expr ';'
-                ;
+statPrint returns [StatPrint st]      
+        : PRINT e = expr ';'
+        {st = new StatPrint(e,false);}
+        ;
 
-statPrintln     : PRINTLN expr ';'
-                ;
+statPrintln returns [StatPrint st]    
+        : PRINTLN e = expr ';'
+        {st = new StatPrint(e,true);}
+        ;
 
-statReturn      : RETURN expr? ';'
-                ;
+statReturn returns [StatReturn st]     
+        : RETURN (e = expr)? ';'
+        {st = new StatReturn(e);}
+        ;
 
-statArrAssn     : arrayAccess '=' expr ';'
-                ;
+statArrAssn returns [StatArrAssn st]    
+        : ac = arrayAccess '=' e = expr ';'
+        {st = new StatArrAssn(ac, e);}
+        ;
 
-statAssn        : id '=' expr ';'
-                ;
+statAssn returns [StatAssn st]       
+        : varName = id '=' e = expr ';'
+        {st = new StatAssn(varName, e);}
+        ;
 
-statExpr        : expr ';'
-                ;
+statExpr returns [StatExpr st]       
+        : e = expr ';'
+        {st = new StatExpr(e);}
+        ;
 
 /* Expressions */
 
-expr            : exprEqualTo
-	        ;
-
-exprEqualTo     : exprLessThan ('==' exprLessThan)*
-                ;
-
-exprLessThan    : exprAddSub ('<' exprAddSub)*
-                ;
-
-exprAddSub      : exprMult (('+'|'-') exprMult)*
-                ;
-
-exprMult        : atom ('*' atom)*
-	        ;
-
-atom    :
-        (id '[')=> arrayAccess
-        | (id '(')=> call
-        | id
-        | literal
-        | '(' expr ')'
-        ;
-
-arrayAccess     : id '[' expr ']'
-                ;
-
-call    : id '(' exprList* ')'
-        ;
-
-id      : ID
-        ;
-
-exprList        : expr (',' expr)*
-                ;
-
-literal : CONST_INT | CONST_CHAR | CONST_STRING | CONST_FLOAT | TRUE | FALSE
-        ;
-
-type:	TYPE_INT | TYPE_FLOAT | TYPE_CHAR | TYPE_STRING | TYPE_BOOL | TYPE_VOID
+expr returns [Expr e]           
+        : e1 = exprEqualTo {e = e1;}
 	;
 
-compoundType : type '[' CONST_INT ']'
-        | type
+exprEqualTo returns [Expr e]    
+@init
+{
+        Expr temp = null;
+}
+@after
+{
+        e = temp;
+}
+        : el = exprLessThan {temp = el;} 
+        ('==' er = exprLessThan {temp = new ExprEqualTo(temp,er);})*
+        ;
+
+exprLessThan returns [Expr e]
+@init
+{
+        Expr temp = null;
+}
+@after
+{
+        e = temp;
+}
+        : el = exprAddSub {temp = el;} 
+        ('<' er = exprAddSub {temp = new ExprLessThan(temp,er);})*
+        ;
+
+exprAddSub returns [Expr e]
+@init
+{
+        Expr temp = null;
+}
+@after
+{
+        e = temp;
+}
+        : el = exprMult {temp = el;} 
+        (('+' er = exprMult {temp = new ExprAdd(temp,er);}) 
+        | ('-' er = exprMult {temp = new ExprSub(temp,er);}))*
+        ;
+
+exprMult returns [Expr e]
+@init
+{
+        Expr temp = null;
+}
+@after
+{
+        e = temp;
+}
+        : el = atom {temp = el;} 
+        ('*' er = atom {temp = new ExprMult(temp,er);})*
+        ;
+
+atom returns [Expr e]   
+        :
+        (id '[')=> ac = arrayAccess {e = ac;}
+        | (id '(')=> fc = call {e = fc;}
+        | ei = id {e = ei;}
+        | l = literal {e = l;}
+        | '(' e1 = expr ')' {e = new ExprParen(e1);}
+        ;
+
+arrayAccess returns [ExprArrAcc ac]    
+        : arrID = id '[' e = expr ']' {ac = new ExprArrAcc(arrID,e);}
+        ;
+
+call returns [ExprFuncCall fc]   
+        : funcID = id '(' el = exprList ')' {fc = new ExprFuncCall(funcID, el);}
+        ;
+
+id      returns [ExprIden id]
+        : name = ID
+        {id = new ExprIden(name.getText());}
+        ;
+
+exprList returns [ExprList el]       
+@init
+{
+        el = new ExprList();
+}
+        : (e = expr {el.addExpr(e);} (',' e2 = expr {el.addExpr(e2);})*)?
+        ;
+
+literal returns [ExprLiteral l]
+        : val = CONST_INT 
+                {
+                        int i = Integer.parseInt(val.getText());
+                        l = new ExprLiteral<Integer>(Integer.class, i);
+                }
+        | val = CONST_CHAR 
+                {
+                        char c = val.getText().charAt(0);
+                        l = new ExprLiteral<Character>(Character.class, c);
+                }
+        | val = CONST_STRING 
+                {
+                        l = new ExprLiteral<String>(String.class, val.getText());
+                }
+        | val = CONST_FLOAT 
+                {
+                        float f = Float.parseFloat(val.getText());
+                        l = new ExprLiteral<Float>(Float.class, f);
+                }
+        | val = TRUE 
+                {
+                        l = new ExprLiteral<Boolean>(Boolean.class, true);
+                }
+        | val = FALSE
+                {
+                        l = new ExprLiteral<Boolean>(Boolean.class, false);
+                }
+        ;
+
+type returns [Type t]
+        : TYPE_INT {t = new Type(Type.TypeID.INT);} 
+        | TYPE_FLOAT {t = new Type(Type.TypeID.FLOAT);} 
+        | TYPE_CHAR {t = new Type(Type.TypeID.STRING);}
+        | TYPE_STRING {t = new Type(Type.TypeID.STRING);}
+        | TYPE_BOOL {t = new Type(Type.TypeID.BOOL);}
+        | TYPE_VOID {t = new Type(Type.TypeID.VOID);}
+	;
+
+compoundType returns [Type t]
+        : tp = type '[' sz = CONST_INT ']' {t = new TypeArr(tp.typeID, Integer.parseInt(sz.getText()));}
+        | tp = type {t = tp;}
         ;
 
 /*
@@ -246,7 +380,7 @@ OP_ASSIGN       : '='
 
 /* Constant values */
 
-CONST_INT       : '-'? ('0' | ('1'..'9'('0'..'9')*))
+CONST_INT       : ('0'..'9')+
         ;
 
 CONST_STRING    : '"'  STR_CHARS* '"'
@@ -268,5 +402,5 @@ WS      : ( '\t' | ' ' | ('\r' | '\n') )+ { $channel = HIDDEN;}
 
 /* Comments */
 
-COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n') { $channel = HIDDEN;}
+COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n' | EOF) { $channel = HIDDEN;}
         ;
