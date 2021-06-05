@@ -5,10 +5,10 @@ GSRC= $(GNAME).g
 all: grammar compiler test
 
 grammar: $(GSRCS)
-	java org.antlr.Tool -fo ./src/ ./src/$(GSRC) 
+	java -cp "./antlr3.jar" org.antlr.Tool -fo ./src/ ./src/$(GSRC) 
 
 compiler:
-	javac ./src/*.java ./src/*/*.java -d ./build
+	javac -cp "./antlr3.jar" ./src/*.java ./src/*/*.java -d ./build
 
 .PHONY: test
 

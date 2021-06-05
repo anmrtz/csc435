@@ -7,7 +7,7 @@ NC='\033[0m'
 echo "Testing valid .ul files for acceptance"
 for f in ./ul-accepted-valid/*.ul; do
     echo "Testing $f file... "
-    java -cp "/usr/share/java/antlr3-runtime.jar:../build" Compiler $f
+    java -cp "../antlr3.jar:../build" Compiler $f
     if [ $? -eq 0 ]
     then
         echo -e "${GREEN}PASS${NC}"
@@ -19,7 +19,7 @@ done
 echo -e "\nTesting invalid .ul files for rejection"
 for f in ./ul-rejected/*.ul; do
     echo -n "Testing $f file... "
-    java -cp "/usr/share/java/antlr3-runtime.jar:../build" Compiler $f 
+    java -cp "../antlr3.jar:../build" Compiler $f 
     if [ $? -ne 0 ]
     then
         echo -e "${GREEN}PASS${NC}"
