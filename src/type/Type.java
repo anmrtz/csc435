@@ -29,7 +29,7 @@ public class Type {
             case STRING:
                 return "string";
             case BOOL:
-                return "bool";
+                return "boolean";
             case VOID:
                 return "void";
             default:

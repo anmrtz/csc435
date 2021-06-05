@@ -238,7 +238,7 @@ literal returns [ExprLiteral l]
                 }
         | val = CONST_CHAR 
                 {
-                        char c = val.getText().charAt(0);
+                        char c = val.getText().charAt(1);
                         l = new ExprLiteral<Character>(Character.class, c);
                 }
         | val = CONST_STRING 
@@ -247,8 +247,8 @@ literal returns [ExprLiteral l]
                 }
         | val = CONST_FLOAT 
                 {
-                        float f = Float.parseFloat(val.getText());
-                        l = new ExprLiteral<Float>(Float.class, f);
+                        double d = Double.parseDouble(val.getText());
+                        l = new ExprLiteral<Double>(Double.class, d);
                 }
         | val = TRUE 
                 {
@@ -263,7 +263,7 @@ literal returns [ExprLiteral l]
 type returns [Type t]
         : TYPE_INT {t = new Type(Type.TypeID.INT);} 
         | TYPE_FLOAT {t = new Type(Type.TypeID.FLOAT);} 
-        | TYPE_CHAR {t = new Type(Type.TypeID.STRING);}
+        | TYPE_CHAR {t = new Type(Type.TypeID.CHAR);}
         | TYPE_STRING {t = new Type(Type.TypeID.STRING);}
         | TYPE_BOOL {t = new Type(Type.TypeID.BOOL);}
         | TYPE_VOID {t = new Type(Type.TypeID.VOID);}

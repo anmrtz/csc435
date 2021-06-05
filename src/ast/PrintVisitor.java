@@ -1,16 +1,17 @@
 package ast;
 
-import jdk.jshell.spi.ExecutionControl.RunException;
-import java.lang.RuntimeException;
-
 public class PrintVisitor extends Visitor<Void> {
+
+    private int currIndent = 0;
 
     private void print(String s) {
         System.out.print(s);
     }
 
     private void tab() {
-        System.out.print("    ");
+        for (int i = 0; i < currIndent; ++i) {
+            System.out.print("    ");
+        }
     }
 
     @Override
@@ -24,18 +25,20 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionBody fb) {
+        tab();
         print("{\n");
-
+        this.currIndent++;
         for (VarDecl vd : fb.funcVars) {
             tab(); vd.accept(this);
             print(";\n");
         }
-
+        
         for (Stat st : fb.funcStats) {
             tab(); st.accept(this);
             print("\n");
         }
-
+        this.currIndent--;
+        tab();
         print("}");
 
         return null;
@@ -78,7 +81,14 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public <R> Void visit(ExprLiteral<R> l) {
-        print(l.value.toString());
+        if (l.literalType == Character.class) {
+            print("\'");
+            print(l.value.toString());
+            print("\'");
+        }
+        else {
+            print(l.value.toString());
+        }
 
         return null;
     }
@@ -92,14 +102,21 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public Void visit(StatArrAssn st) {
-        
+        st.arrAcc.accept(this);
+        print(" = ");
+        st.expr.accept(this);
+        print(";");
 
         return null;
     }
 
     @Override
     public Void visit(StatAssn st) {
-        // TODO Auto-generated method stub
+        st.varName.accept(this);
+        print(" = ");
+        st.expr.accept(this);
+        print(";");
+        
         return null;
     }
 
@@ -119,6 +136,8 @@ public class PrintVisitor extends Visitor<Void> {
         st.ifBlock.accept(this);
         print("\n");
         if (st.elseBlock != null) {
+            tab();
+            print("else\n");
             st.elseBlock.accept(this);
             print("\n");
         }
@@ -128,7 +147,7 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public Void visit(StatPrint st) {
-        print("print ");
+        print(st.newLine ? "println " : "print ");
         st.expr.accept(this);
         print(";");
 
@@ -159,12 +178,15 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public Void visit(Block b) {
+        tab();
         print("{\n");
-
+        this.currIndent++;
         for (Stat st : b.blockStats) {
             tab(); st.accept(this);
             print("\n");
         }
+        this.currIndent--;
+        tab();
         print("}");
 
         return null;
