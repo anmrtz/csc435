@@ -18,46 +18,34 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public Void visit(Function f) {
-        f.fd.accept(this);
+        print(f.funcType.toString() + " "); 
+        f.funcId.accept(this);
+        print(" (");
+
+        for (int i = 0; i < f.funcParams.size(); ++i) {
+            f.funcParams.get(i).accept(this);
+            if (i < f.funcParams.size() - 1) 
+                print(", ");
+        }
+        print(")");
+
         print("\n");
-        f.fb.accept(this);
 
-        return null;
-    }
-
-    @Override
-    public Void visit(FunctionBody fb) {
         tab();
         print("{\n");
         this.currIndent++;
-        for (VarDecl vd : fb.funcVars) {
+        for (VarDecl vd : f.funcVars) {
             tab(); vd.accept(this);
             print(";\n");
         }
         
-        for (Stat st : fb.funcStats) {
+        for (Stat st : f.funcStats) {
             tab(); st.accept(this);
             print("\n");
         }
         this.currIndent--;
         tab();
         print("}");
-
-        return null;
-    }
-
-    @Override
-    public Void visit(FunctionDecl fd) {
-        print(fd.funcType.toString() + " "); 
-        fd.funcId.accept(this);
-        print(" (");
-
-        for (int i = 0; i < fd.funcParams.size(); ++i) {
-            fd.funcParams.get(i).accept(this);
-            if (i < fd.funcParams.size() - 1) 
-                print(", ");
-        }
-        print(")");
 
         return null;
     }

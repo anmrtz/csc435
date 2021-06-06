@@ -2,7 +2,7 @@ package ast;
 
 import java.util.ArrayList;
 
-public class FunctionBody extends ASTNode {
+public class FunctionBody {
 
     public ArrayList<VarDecl> funcVars = new ArrayList<VarDecl>();
     public ArrayList<Stat> funcStats = new ArrayList<Stat>();;
@@ -14,9 +14,4 @@ public class FunctionBody extends ASTNode {
     public void addStatement(Stat st) {
         funcStats.add(st);
     }
-
-    @Override
-    public <T> T accept(Visitor<T> v) {
-        return v.visit(this);
-    }    
 }

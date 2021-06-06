@@ -2,16 +2,26 @@ package ast;
 
 import java.util.ArrayList;
 
+import type.*;
+
 public class Function extends ASTNode {
 
-    public FunctionDecl fd;
-    public FunctionBody fb;
+    public Type funcType;
+    public ExprIden funcId;
 
-    public ArrayList<VarDecl> funcVars = new ArrayList<VarDecl>();
+    public ArrayList<VarDecl> funcParams;
+    public ArrayList<VarDecl> funcVars;
+
+    public ArrayList<Stat> funcStats;
 
     public Function(FunctionDecl fd, FunctionBody fb) {
-        this.fd = fd;
-        this.fb = fb;
+        this.funcType = fd.funcType;
+        this.funcId = fd.funcId;
+        
+        this.funcParams = fd.funcParams;
+        this.funcVars = fb.funcVars;
+
+        this.funcStats = fb.funcStats;
     }
 
     @Override
