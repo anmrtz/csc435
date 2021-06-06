@@ -3,16 +3,12 @@ package ast;
 public abstract class Visitor<T> {
     public abstract T visit(Block b);
 
-    public abstract T visit(ExprAdd ex);
     public abstract T visit(ExprArrAcc ex);
-    public abstract T visit(ExprEqualTo ex);
+    public abstract T visit(ExprBinaryOp ex);
     public abstract T visit(ExprFuncCall ex);
     public abstract T visit(ExprIden ex);
-    public abstract T visit(ExprLessThan ex);
     public abstract <R> T visit(ExprLiteral<R> lt);
-    public abstract T visit(ExprMult ex);
     public abstract T visit(ExprParen id);
-    public abstract T visit(ExprSub id);
 
     public abstract T visit(ExprList exprList);
 

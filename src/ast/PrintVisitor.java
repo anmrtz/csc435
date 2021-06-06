@@ -199,24 +199,6 @@ public class PrintVisitor extends Visitor<Void> {
     }
 
     @Override
-    public Void visit(ExprAdd ex) {
-        ex.el.accept(this);
-        print("+");
-        ex.er.accept(this);
-
-        return null;
-    }
-
-    @Override
-    public Void visit(ExprSub ex) {
-        ex.el.accept(this);
-        print("-");
-        ex.er.accept(this);
-
-        return null;
-    }
-
-    @Override
     public Void visit(ExprArrAcc ex) {
         ex.id.accept(this);
         print("[");
@@ -227,38 +209,11 @@ public class PrintVisitor extends Visitor<Void> {
     }
 
     @Override
-    public Void visit(ExprEqualTo ex) {
-        ex.el.accept(this);
-        print("==");
-        ex.er.accept(this);
-
-        return null;
-    }
-
-    @Override
-    public Void visit(ExprLessThan ex) {
-        ex.el.accept(this);
-        print("<");
-        ex.er.accept(this);
-
-        return null;
-    }
-
-    @Override
     public Void visit(ExprFuncCall ex) {
         ex.funcId.accept(this);
         print("(");
         ex.params.accept(this);
         print(")");
-
-        return null;
-    }
-
-    @Override
-    public Void visit(ExprMult ex) {
-        ex.el.accept(this);
-        print("*");
-        ex.er.accept(this);
 
         return null;
     }
@@ -280,6 +235,15 @@ public class PrintVisitor extends Visitor<Void> {
                 print(",");
             }
         }
+
+        return null;
+    }
+
+    @Override
+    public Void visit(ExprBinaryOp ex) {
+        ex.el.accept(this);
+        print(ex.getOpString());
+        ex.er.accept(this);
 
         return null;
     }  

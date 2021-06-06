@@ -33,7 +33,7 @@ public class Type {
             case VOID:
                 return "void";
             default:
-                return "";
+                return null;
         }
     }
 }

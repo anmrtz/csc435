@@ -157,7 +157,7 @@ exprEqualTo returns [Expr e]
         e = temp;
 }
         : el = exprLessThan {temp = el;} 
-        ('==' er = exprLessThan {temp = new ExprEqualTo(temp,er);})*
+        ('==' er = exprLessThan {temp = new ExprBinaryOp(ExprBinaryOp.OpType.EQUAL_TO,temp,er);})*
         ;
 
 exprLessThan returns [Expr e]
@@ -170,7 +170,7 @@ exprLessThan returns [Expr e]
         e = temp;
 }
         : el = exprAddSub {temp = el;} 
-        ('<' er = exprAddSub {temp = new ExprLessThan(temp,er);})*
+        ('<' er = exprAddSub {temp = new ExprBinaryOp(ExprBinaryOp.OpType.LESS_THAN,temp,er);})*
         ;
 
 exprAddSub returns [Expr e]
@@ -183,8 +183,8 @@ exprAddSub returns [Expr e]
         e = temp;
 }
         : el = exprMult {temp = el;} 
-        (('+' er = exprMult {temp = new ExprAdd(temp,er);}) 
-        | ('-' er = exprMult {temp = new ExprSub(temp,er);}))*
+        (('+' er = exprMult {temp = new ExprBinaryOp(ExprBinaryOp.OpType.ADD,temp,er);}) 
+        | ('-' er = exprMult {temp = new ExprBinaryOp(ExprBinaryOp.OpType.SUB,temp,er);}))*
         ;
 
 exprMult returns [Expr e]
@@ -197,7 +197,7 @@ exprMult returns [Expr e]
         e = temp;
 }
         : el = atom {temp = el;} 
-        ('*' er = atom {temp = new ExprMult(temp,er);})*
+        ('*' er = atom {temp = new ExprBinaryOp(ExprBinaryOp.OpType.MULT,temp,er);})*
         ;
 
 atom returns [Expr e]   
