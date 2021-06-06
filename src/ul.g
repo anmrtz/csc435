@@ -157,7 +157,7 @@ exprEqualTo returns [Expr e]
         e = temp;
 }
         : el = exprLessThan {temp = el;} 
-        ('==' er = exprLessThan {temp = new ExprBinaryOp(ExprBinaryOp.OpType.EQUAL_TO,temp,er);})*
+        ('==' er = exprLessThan {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_EQUAL_TO,temp,er);})*
         ;
 
 exprLessThan returns [Expr e]
@@ -170,7 +170,7 @@ exprLessThan returns [Expr e]
         e = temp;
 }
         : el = exprAddSub {temp = el;} 
-        ('<' er = exprAddSub {temp = new ExprBinaryOp(ExprBinaryOp.OpType.LESS_THAN,temp,er);})*
+        ('<' er = exprAddSub {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_LESS_THAN,temp,er);})*
         ;
 
 exprAddSub returns [Expr e]
@@ -183,8 +183,8 @@ exprAddSub returns [Expr e]
         e = temp;
 }
         : el = exprMult {temp = el;} 
-        (('+' er = exprMult {temp = new ExprBinaryOp(ExprBinaryOp.OpType.ADD,temp,er);}) 
-        | ('-' er = exprMult {temp = new ExprBinaryOp(ExprBinaryOp.OpType.SUB,temp,er);}))*
+        (('+' er = exprMult {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_ADD,temp,er);}) 
+        | ('-' er = exprMult {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_SUB,temp,er);}))*
         ;
 
 exprMult returns [Expr e]
@@ -197,7 +197,7 @@ exprMult returns [Expr e]
         e = temp;
 }
         : el = atom {temp = el;} 
-        ('*' er = atom {temp = new ExprBinaryOp(ExprBinaryOp.OpType.MULT,temp,er);})*
+        ('*' er = atom {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_MULT,temp,er);})*
         ;
 
 atom returns [Expr e]   
@@ -261,16 +261,16 @@ literal returns [ExprLiteral l]
         ;
 
 type returns [Type t]
-        : TYPE_INT {t = new Type(Type.TypeID.INT);} 
-        | TYPE_FLOAT {t = new Type(Type.TypeID.FLOAT);} 
-        | TYPE_CHAR {t = new Type(Type.TypeID.CHAR);}
-        | TYPE_STRING {t = new Type(Type.TypeID.STRING);}
-        | TYPE_BOOL {t = new Type(Type.TypeID.BOOL);}
-        | TYPE_VOID {t = new Type(Type.TypeID.VOID);}
+        : TYPE_INT {t = new Type(Type.TypeID.TYPE_INT);} 
+        | TYPE_FLOAT {t = new Type(Type.TypeID.TYPE_FLOAT);} 
+        | TYPE_CHAR {t = new Type(Type.TypeID.TYPE_CHAR);}
+        | TYPE_STRING {t = new Type(Type.TypeID.TYPE_STRING);}
+        | TYPE_BOOL {t = new Type(Type.TypeID.TYPE_BOOL);}
+        | TYPE_VOID {t = new Type(Type.TypeID.TYPE_VOID);}
 	;
 
 compoundType returns [Type t]
-        : tp = type '[' sz = CONST_INT ']' {t = new TypeArr(tp.typeID, Integer.parseInt(sz.getText()));}
+        : tp = type '[' sz = CONST_INT ']' {t = new TypeArr(tp.getType(), Integer.parseInt(sz.getText()));}
         | tp = type {t = tp;}
         ;
 

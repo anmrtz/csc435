@@ -8,6 +8,10 @@ public class ExprIden extends Expr {
         this.name = name;
     }
 
+    public boolean equals(ExprIden other) {
+        return this.name == other.name;
+    }
+
     @Override
     public <T> T accept(Visitor<T> v) {
         return v.visit(this);

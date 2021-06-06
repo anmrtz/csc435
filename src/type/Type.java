@@ -3,34 +3,42 @@ package type;
 public class Type {
 
     static public enum TypeID {
-        INT,
-        FLOAT,
-        CHAR,
-        STRING,
-        BOOL,
-        VOID
+        TYPE_INT,
+        TYPE_FLOAT,
+        TYPE_CHAR,
+        TYPE_STRING,
+        TYPE_BOOL,
+        TYPE_VOID
     }
 
-    public TypeID typeID;
+    private TypeID typeID;
    
     public Type(TypeID typeID) {
         this.typeID = typeID;
     }
 
+    public TypeID getType() {
+        return typeID;
+    }
+
+    public boolean equals(Type other) {
+        return this.typeID == other.typeID;
+    }
+
     @Override
     public String toString() {
         switch (typeID) {
-            case INT:
+            case TYPE_INT:
                 return "int";
-            case FLOAT:
+            case TYPE_FLOAT:
                 return "float";
-            case CHAR:
+            case TYPE_CHAR:
                 return "char";
-            case STRING:
+            case TYPE_STRING:
                 return "string";
-            case BOOL:
+            case TYPE_BOOL:
                 return "boolean";
-            case VOID:
+            case TYPE_VOID:
                 return "void";
             default:
                 return null;

@@ -1,5 +1,7 @@
 package ast;
 
+import type.Type.TypeID;
+
 public class PrintVisitor extends Visitor<Void> {
 
     private int currIndent = 0;
@@ -81,7 +83,7 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public <R> Void visit(ExprLiteral<R> l) {
-        if (l.literalType == Character.class) {
+        if (l.getType() == TypeID.TYPE_CHAR) {
             print("\'");
             print(l.value.toString());
             print("\'");
