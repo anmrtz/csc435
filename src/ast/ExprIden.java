@@ -9,7 +9,11 @@ public class ExprIden extends Expr {
     }
 
     public boolean equals(ExprIden other) {
-        return this.name == other.name;
+        return this.name.equals(other.name);
+    }
+
+    public boolean equals(String other) {
+        return this.name.equals(other);
     }
 
     @Override

@@ -1,10 +1,10 @@
 package ast;
 
 public class ExprFuncCall extends Expr {
-    public ExprIden funcId;
+    public String funcId;
     public ExprList params;
 
-    public ExprFuncCall(ExprIden funcId, ExprList params) {
+    public ExprFuncCall(String funcId, ExprList params) {
         this.funcId = funcId;
         this.params = params;
     }

@@ -24,6 +24,17 @@ public class Compiler {
 		
 			PrintVisitor pv = new PrintVisitor();
 			p.accept(pv);
+
+			System.out.println();
+
+			TypeCheckVisitor tv = new TypeCheckVisitor();
+			p.accept(tv);
+
+			if (tv.compilerErrors()) {
+				System.err.println("Compiler errors:");
+				tv.printCompilerErrors(System.err);
+				System.exit(1);
+			}
 		}
 		catch (RecognitionException e )	{
 			System.exit(1);

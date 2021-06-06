@@ -53,7 +53,7 @@ function returns [Function f]
 
 functionDecl returns [FunctionDecl fd]
         : tp = compoundType vId = id '(' (params = formalParameters)? ')'
-        {fd = new FunctionDecl(tp, vId, params);}
+        {fd = new FunctionDecl(tp, vId.name, params);}
 	;
 
 formalParameters returns [ArrayList<VarDecl> params]
@@ -214,7 +214,7 @@ arrayAccess returns [ExprArrAcc ac]
         ;
 
 call returns [ExprFuncCall fc]   
-        : funcID = id '(' el = exprList ')' {fc = new ExprFuncCall(funcID, el);}
+        : funcID = id '(' el = exprList ')' {fc = new ExprFuncCall(funcID.name, el);}
         ;
 
 id      returns [ExprIden id]

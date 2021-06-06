@@ -12,17 +12,17 @@ public class ExprLiteral<R> extends Expr {
     }
 
     public TypeID getType() {
-        if (literalType == Integer.class)
+        if (literalType.equals(Integer.class))
             return TypeID.TYPE_INT;
-        else if (literalType == Float.class)
+        else if (literalType.equals(Float.class))
             return TypeID.TYPE_FLOAT;
-        else if (literalType == Character.class)
+        else if (literalType.equals(Character.class))
             return TypeID.TYPE_CHAR;
-        else if (literalType == String.class)
+        else if (literalType.equals(String.class))
             return TypeID.TYPE_STRING;
-        else if (literalType == Boolean.class)
+        else if (literalType.equals(Boolean.class))
             return TypeID.TYPE_BOOL;
-        else if (literalType == Void.class)
+        else if (literalType.equals(Void.class))
             return TypeID.TYPE_VOID;
         else
             return null;

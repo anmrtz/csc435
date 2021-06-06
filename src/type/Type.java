@@ -22,7 +22,11 @@ public class Type {
     }
 
     public boolean equals(Type other) {
-        return this.typeID == other.typeID;
+        return this.typeID.equals(other.typeID);
+    }
+
+    public boolean equals(TypeID other) {
+        return this.typeID.equals(other);
     }
 
     @Override

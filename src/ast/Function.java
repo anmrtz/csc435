@@ -7,7 +7,7 @@ import type.*;
 public class Function extends ASTNode {
 
     public Type funcType;
-    public ExprIden funcId;
+    public String funcId;
 
     public ArrayList<VarDecl> funcParams;
     public ArrayList<VarDecl> funcVars;

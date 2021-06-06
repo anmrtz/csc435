@@ -19,7 +19,7 @@ public class PrintVisitor extends Visitor<Void> {
     @Override
     public Void visit(Function f) {
         print(f.funcType.toString() + " "); 
-        f.funcId.accept(this);
+        print(f.funcId);
         print(" (");
 
         for (int i = 0; i < f.funcParams.size(); ++i) {
@@ -200,7 +200,7 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public Void visit(ExprFuncCall ex) {
-        ex.funcId.accept(this);
+        print(ex.funcId);
         print("(");
         ex.params.accept(this);
         print(")");
