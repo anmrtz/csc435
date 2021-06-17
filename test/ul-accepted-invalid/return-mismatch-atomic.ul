@@ -1,0 +1,6 @@
+int foo() {
+    string s;
+    return s;
+}
+
+void main() {}

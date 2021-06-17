@@ -1,0 +1,7 @@
+void foo(int i, char c) {}
+
+void main() {
+    int j;
+    
+    foo(j);
+}

@@ -1,0 +1,8 @@
+void foo(int i, char c) {}
+
+void main() {
+    int j;
+    string s;
+
+    foo(j,s);
+}

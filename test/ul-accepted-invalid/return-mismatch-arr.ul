@@ -1,0 +1,6 @@
+int[3] foo() {
+    int[4] arr;
+    return arr;
+}
+
+void main() {}

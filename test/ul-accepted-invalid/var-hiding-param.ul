@@ -1,0 +1,5 @@
+void foo(int i) {
+    char i;
+}
+
+void main() {}

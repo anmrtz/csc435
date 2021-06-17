@@ -1,0 +1,6 @@
+void main() {
+    int i;
+    if (true) {
+        i = "x";
+    }
+}
