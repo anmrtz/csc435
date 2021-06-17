@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Block extends ASTNode {
 
-    ArrayList<Stat> blockStats = new ArrayList<Stat>();
+    public ArrayList<Stat> blockStats = new ArrayList<Stat>();
 
     public void addStatement(Stat s) {
         blockStats.add(s);

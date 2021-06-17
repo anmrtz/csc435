@@ -18,6 +18,9 @@ public class Type {
     }
 
     public boolean equals(Type other) {
+        if (other instanceof TypeArr) {
+            return false;
+        }
         return this.atomicType == other.atomicType;
     }
 

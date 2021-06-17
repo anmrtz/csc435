@@ -20,6 +20,23 @@ public class ExprBinaryOp extends Expr {
         this.er = er;
     }
 
+    public String getOpString() {
+        switch (opType) {
+            case OP_LESS_THAN:
+                return "<";
+            case OP_EQUAL_TO:
+                return "==";
+            case OP_ADD:
+                return "+";
+            case OP_SUB:
+                return "-";
+            case OP_MULT:
+                return "*";
+            default:
+                return null;
+        }
+    }
+
     @Override
     public <T> T accept(Visitor<T> v) {
         return v.visit(this);

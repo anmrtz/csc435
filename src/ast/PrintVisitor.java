@@ -232,22 +232,7 @@ public class PrintVisitor extends Visitor<Void> {
     @Override
     public Void visit(ExprBinaryOp ex) {
         ex.el.accept(this);
-        switch (ex.opType) {
-            case OP_LESS_THAN:
-                print("<");
-                break;
-            case OP_EQUAL_TO:
-                print("==");
-                break;
-            case OP_ADD:
-                print("+");
-                break;
-            case OP_SUB:
-                print("-");
-                break;
-            case OP_MULT:
-                print("*");
-        }
+        print(ex.getOpString());
         ex.er.accept(this);
 
         return null;

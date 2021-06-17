@@ -4,10 +4,12 @@ import ast.*;
 import ast.ExprBinaryOp.*;
 import type.Type.AtomicType;
 
+import java.util.HashMap;
+
 public class TypeCheckVisitor extends Visitor<Type> {
 
-    private Environment<String,Function> funcDecs = new Environment<String,Function>();
-    private Environment<String,Type> varDecs = new Environment<String,Type>();
+    private HashMap<String,Function> funcDecs = new HashMap<String,Function>();
+    private Environment<String,Type> environment = new Environment<String,Type>();
 
     private void raiseError(String errMsg, ASTNode node) throws SemanticException {
         throw new SemanticException(errMsg, node);
@@ -20,11 +22,10 @@ public class TypeCheckVisitor extends Visitor<Type> {
             raiseError("program must contain at least one function", p);
         }
 
-        funcDecs.beginScope(); 
         boolean mainFound = false;
         for (Function f : p.progFuncs) {
             // Check for duplicate function name
-            if (funcDecs.inCurrentScope(f.funcId)) {
+            if (funcDecs.containsKey(f.funcId)) {
                 raiseError("duplicate function name", f);
             }
 
@@ -35,8 +36,12 @@ public class TypeCheckVisitor extends Visitor<Type> {
                 if (f.funcType.atomicType != AtomicType.TYPE_VOID) {
                     raiseError("main function must have type void", f);
                 }
+                // Check for empty parameter list
+                if (!f.funcParams.isEmpty()) {
+                    raiseError("main function must have no parameters", f);
+                }
             }
-            funcDecs.add(f.funcId, f);            
+            funcDecs.put(f.funcId, f);            
         }
 
         if (!mainFound) {
@@ -47,17 +52,16 @@ public class TypeCheckVisitor extends Visitor<Type> {
             f.accept(this);
         }
 
-        funcDecs.endScope();
         return null;
     }
 
     @Override
     public Type visit(Function f) {
         // Check for duplicate parameters, duplicate locals, and local variables hiding parameters
-        varDecs.beginScope();
+        environment.beginScope(f);
 
         for (VarDecl vd : f.funcParams) {
-            if (varDecs.inCurrentScope(vd.varName.name)) {
+            if (environment.inCurrentScope(vd.varName.name)) {
                 raiseError(String.format("variable \"%s\" already defined", vd.varName.name), vd);
             }
     
@@ -65,11 +69,11 @@ public class TypeCheckVisitor extends Visitor<Type> {
                 raiseError("variables must not have type void", vd);
             }
  
-            varDecs.add(vd.varName.name, vd.varType);
+            environment.add(vd.varName.name, vd.varType);
         }
 
         for (VarDecl vd : f.funcVars) {
-            if (varDecs.inCurrentScope(vd.varName.name)) {
+            if (environment.inCurrentScope(vd.varName.name)) {
                 raiseError(String.format("variable \"%s\" already defined", vd.varName.name), vd);
             }
     
@@ -77,22 +81,14 @@ public class TypeCheckVisitor extends Visitor<Type> {
                 raiseError("variables must not have type void", vd);
             }
 
-            varDecs.add(vd.varName.name, vd.varType);
+            environment.add(vd.varName.name, vd.varType);
         }
 
         for (Stat st : f.funcStats) {
-            final Type statType = st.accept(this);
-
-            // Check that return type matches function type
-            if ((st instanceof StatReturn) && !(statType.atomicType != AtomicType.TYPE_VOID)) {
-                if (!statType.equals(f.funcType)) {
-                    raiseError(String.format("return type does not match function type (%s to %s)", 
-                        statType, f.funcType), st);
-                }
-            }
+            st.accept(this);
         }
 
-        varDecs.endScope();
+        environment.endScope();
         return null;
     }
 
@@ -120,7 +116,7 @@ public class TypeCheckVisitor extends Visitor<Type> {
 
     @Override
     public Type visit(StatAssn st) {
-        final Type varType = varDecs.lookup(st.varName.name);
+        final Type varType = environment.lookup(st.varName.name);
 
         if (varType == null) {
             raiseError(String.format("undefined variable %s",st.varName.name), st);
@@ -136,6 +132,8 @@ public class TypeCheckVisitor extends Visitor<Type> {
 
     @Override
     public Type visit(StatExpr st) {
+        st.expr.accept(this);
+
         return null;
     }
 
@@ -146,6 +144,11 @@ public class TypeCheckVisitor extends Visitor<Type> {
         if ((exprType instanceof TypeArr) ||
             (exprType.atomicType != AtomicType.TYPE_BOOL)) {
             raiseError("if-statement condition must be type boolean", st);
+        }
+
+        st.ifBlock.accept(this);
+        if (st.elseBlock != null) {
+            st.elseBlock.accept(this);
         }
 
         return null;
@@ -166,11 +169,22 @@ public class TypeCheckVisitor extends Visitor<Type> {
     @Override
     public Type visit(StatReturn st) {
         if (st.expr == null) {
-            return new Type(AtomicType.TYPE_VOID);
+            return null;
         }
-        else {
-            return st.expr.accept(this);
+        
+        final Type returnType = st.expr.accept(this);
+
+        // Check that return type matches function type
+        if (returnType.atomicType != AtomicType.TYPE_VOID) {
+            final Function scopeFunction = environment.getScopeFunction();
+
+            if (!returnType.equals(scopeFunction.funcType)) {
+                raiseError(String.format("return type does not match function type (%s to %s)", 
+                    returnType, scopeFunction.funcType), st);
+            }
         }
+
+        return null;
     }
 
     @Override
@@ -182,17 +196,23 @@ public class TypeCheckVisitor extends Visitor<Type> {
             raiseError("while-statement condition must be type boolean", st);
         }
 
+        st.whileBlock.accept(this);
+
         return null;
     }
 
     @Override
     public Type visit(Block b) {
+        for (Stat st : b.blockStats) {
+            st.accept(this);
+        }
+
         return null;
     }
 
     @Override
     public Type visit(ExprArrAcc ex) {
-        final Type arrType = varDecs.lookup(ex.id.name);
+        final Type arrType = environment.lookup(ex.id.name);
 
         if (arrType == null) {
             raiseError(String.format("undefined variable %s",ex.id.name), ex);
@@ -200,7 +220,7 @@ public class TypeCheckVisitor extends Visitor<Type> {
         if (!(arrType instanceof TypeArr)) {
             raiseError("array access of non-array type", ex);
         }
-        if (ex.idxExpr.accept(this).atomicType != AtomicType.TYPE_INT) {
+        if (!ex.idxExpr.accept(this).equals(new Type(AtomicType.TYPE_INT))) {
             raiseError("array index must be an integer", ex);
         }
 
@@ -244,13 +264,16 @@ public class TypeCheckVisitor extends Visitor<Type> {
         }
 
         if (!validOperand(ex.opType, leftType)) {
-            raiseError(String.format("invalid left binary operand type %s", leftType), ex);
+            raiseError(String.format("invalid left binary operand type (%s %s)", 
+                leftType, ex.getOpString()), ex);
         }
         if (!validOperand(ex.opType, rightType)) {
-            raiseError(String.format("invalid right binary operand type %s", rightType), ex);
+            raiseError(String.format("invalid right binary operand type (%s %s)", 
+                ex.getOpString(), rightType), ex);
         }
         if (!leftType.equals(rightType)) {
-            raiseError(String.format("binary operand mismatch (%s %s)", leftType, rightType), ex);
+            raiseError(String.format("binary operand mismatch (%s %s %s)", 
+                leftType, ex.getOpString(), rightType), ex);
         }
 
         if ((ex.opType == OpType.OP_EQUAL_TO) || (ex.opType == OpType.OP_LESS_THAN)) {
@@ -263,7 +286,7 @@ public class TypeCheckVisitor extends Visitor<Type> {
 
     @Override
     public Type visit(ExprFuncCall ex) {
-        final Function function = funcDecs.lookup(ex.funcId);
+        final Function function = funcDecs.get(ex.funcId);
 
         // Check that function exists
         if (function == null) {
@@ -291,7 +314,7 @@ public class TypeCheckVisitor extends Visitor<Type> {
 
     @Override
     public Type visit(ExprIden ex) {
-        final Type varType = varDecs.lookup(ex.name);
+        final Type varType = environment.lookup(ex.name);
 
         if (varType == null) {
             raiseError(String.format("undefined variable %s", ex.name), ex);
