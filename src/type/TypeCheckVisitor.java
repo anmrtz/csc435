@@ -1,6 +1,7 @@
 package type;
 
 import ast.*;
+import ast.ExprBinaryOp.*;
 import type.Type.AtomicType;
 
 public class TypeCheckVisitor extends Visitor<Type> {
@@ -207,10 +208,57 @@ public class TypeCheckVisitor extends Visitor<Type> {
         return new Type(arrType.atomicType);
     }
 
+    private boolean validOperand(OpType op, Type type) {
+        final AtomicType atomicType = type.atomicType;
+
+        if (atomicType == AtomicType.TYPE_VOID) {
+            return false;
+        }
+
+        switch (op) {
+            case OP_ADD:
+                return (atomicType != AtomicType.TYPE_BOOL);
+            case OP_SUB:
+                return (atomicType != AtomicType.TYPE_BOOL)
+                    && (atomicType != AtomicType.TYPE_STRING);
+            case OP_MULT:
+                return (atomicType != AtomicType.TYPE_BOOL)
+                    && (atomicType != AtomicType.TYPE_STRING)
+                    && (atomicType != AtomicType.TYPE_CHAR);
+            case OP_EQUAL_TO:
+                return true;
+            case OP_LESS_THAN:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     @Override
     public Type visit(ExprBinaryOp ex) {
-        // TODO Auto-generated method stub
-        return new Type(AtomicType.TYPE_VOID);
+        final Type leftType = ex.el.accept(this);
+        final Type rightType = ex.er.accept(this);
+
+        if ((leftType instanceof TypeArr) || (rightType instanceof TypeArr)) {
+            raiseError("binary operands must be non-void atomic type", ex);
+        }
+
+        if (!validOperand(ex.opType, leftType)) {
+            raiseError(String.format("invalid left binary operand type %s", leftType), ex);
+        }
+        if (!validOperand(ex.opType, rightType)) {
+            raiseError(String.format("invalid right binary operand type %s", rightType), ex);
+        }
+        if (!leftType.equals(rightType)) {
+            raiseError(String.format("binary operand mismatch (%s %s)", leftType, rightType), ex);
+        }
+
+        if ((ex.opType == OpType.OP_EQUAL_TO) || (ex.opType == OpType.OP_LESS_THAN)) {
+            return new Type(AtomicType.TYPE_BOOL);
+        }
+        else {
+            return new Type(leftType.atomicType);
+        }
     }
 
     @Override
