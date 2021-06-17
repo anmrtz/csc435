@@ -261,16 +261,16 @@ literal returns [ExprLiteral l]
         ;
 
 type returns [Type t]
-        : TYPE_INT {t = new Type(Type.TypeID.TYPE_INT);} 
-        | TYPE_FLOAT {t = new Type(Type.TypeID.TYPE_FLOAT);} 
-        | TYPE_CHAR {t = new Type(Type.TypeID.TYPE_CHAR);}
-        | TYPE_STRING {t = new Type(Type.TypeID.TYPE_STRING);}
-        | TYPE_BOOL {t = new Type(Type.TypeID.TYPE_BOOL);}
-        | TYPE_VOID {t = new Type(Type.TypeID.TYPE_VOID);}
+        : TYPE_INT {t = new Type(Type.AtomicType.TYPE_INT);} 
+        | TYPE_FLOAT {t = new Type(Type.AtomicType.TYPE_FLOAT);} 
+        | TYPE_CHAR {t = new Type(Type.AtomicType.TYPE_CHAR);}
+        | TYPE_STRING {t = new Type(Type.AtomicType.TYPE_STRING);}
+        | TYPE_BOOL {t = new Type(Type.AtomicType.TYPE_BOOL);}
+        | TYPE_VOID {t = new Type(Type.AtomicType.TYPE_VOID);}
 	;
 
 compoundType returns [Type t]
-        : tp = type '[' sz = CONST_INT ']' {t = new TypeArr(tp.getType(), Integer.parseInt(sz.getText()));}
+        : tp = type '[' sz = CONST_INT ']' {t = new TypeArr(tp.atomicType, Integer.parseInt(sz.getText()));}
         | tp = type {t = tp;}
         ;
 

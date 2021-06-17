@@ -1,9 +1,9 @@
 package ast;
 
-import type.Type.TypeID;
+import type.Type.AtomicType;
 
 public class ExprLiteral<R> extends Expr {
-    private Class<R> literalType;
+    private final Class<R> literalType;
     public R value;
 
     public ExprLiteral(Class<R> literalType, R value) {
@@ -11,19 +11,19 @@ public class ExprLiteral<R> extends Expr {
         this.value = value;
     }
 
-    public TypeID getType() {
+    public AtomicType getAtomicType() {
         if (literalType.equals(Integer.class))
-            return TypeID.TYPE_INT;
+            return AtomicType.TYPE_INT;
         else if (literalType.equals(Float.class))
-            return TypeID.TYPE_FLOAT;
+            return AtomicType.TYPE_FLOAT;
         else if (literalType.equals(Character.class))
-            return TypeID.TYPE_CHAR;
+            return AtomicType.TYPE_CHAR;
         else if (literalType.equals(String.class))
-            return TypeID.TYPE_STRING;
+            return AtomicType.TYPE_STRING;
         else if (literalType.equals(Boolean.class))
-            return TypeID.TYPE_BOOL;
+            return AtomicType.TYPE_BOOL;
         else if (literalType.equals(Void.class))
-            return TypeID.TYPE_VOID;
+            return AtomicType.TYPE_VOID;
         else
             return null;
     }

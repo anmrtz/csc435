@@ -1,11 +1,21 @@
 package type;
 
 public class TypeArr extends Type {
-    public int arrSize;
+    public final int arrSize;
 
-    public TypeArr(TypeID typeID, int arrSize) {
+    public TypeArr(AtomicType typeID, int arrSize) {
         super(typeID);
         this.arrSize = arrSize;
+    }
+
+    @Override
+    public boolean equals(Type other) {
+        return false;
+    }
+
+    public boolean equals(TypeArr other) {
+        return (this.arrSize == other.arrSize) && 
+            (super.atomicType == other.atomicType);
     }
 
     @Override

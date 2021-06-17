@@ -1,6 +1,6 @@
 package ast;
 
-import type.Type.TypeID;
+import type.Type.AtomicType;
 
 public class PrintVisitor extends Visitor<Void> {
 
@@ -71,7 +71,7 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public <R> Void visit(ExprLiteral<R> l) {
-        if (l.getType() == TypeID.TYPE_CHAR) {
+        if (l.getAtomicType() == AtomicType.TYPE_CHAR) {
             print("\'");
             print(l.value.toString());
             print("\'");

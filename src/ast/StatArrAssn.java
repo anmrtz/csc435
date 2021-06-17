@@ -3,7 +3,7 @@ package ast;
 public class StatArrAssn extends Stat {
 
     public ExprArrAcc arrAcc;
-    Expr expr;
+    public Expr expr;
 
     public StatArrAssn(ExprArrAcc arrAcc, Expr expr) {
         this.arrAcc = arrAcc;

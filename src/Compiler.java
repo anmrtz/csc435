@@ -1,6 +1,8 @@
 import org.antlr.runtime.*;
 import java.io.*;
+
 import ast.*;
+import type.*;
 
 public class Compiler {
 	public static void main (String[] args) throws Exception {

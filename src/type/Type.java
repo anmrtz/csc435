@@ -2,7 +2,7 @@ package type;
 
 public class Type {
 
-    static public enum TypeID {
+    static public enum AtomicType {
         TYPE_INT,
         TYPE_FLOAT,
         TYPE_CHAR,
@@ -11,27 +11,19 @@ public class Type {
         TYPE_VOID
     }
 
-    private TypeID typeID;
+    public final AtomicType atomicType;
    
-    public Type(TypeID typeID) {
-        this.typeID = typeID;
-    }
-
-    public TypeID getType() {
-        return typeID;
+    public Type(AtomicType atomicType) {
+        this.atomicType = atomicType;
     }
 
     public boolean equals(Type other) {
-        return this.typeID.equals(other.typeID);
-    }
-
-    public boolean equals(TypeID other) {
-        return this.typeID.equals(other);
+        return this.atomicType == other.atomicType;
     }
 
     @Override
     public String toString() {
-        switch (typeID) {
+        switch (atomicType) {
             case TYPE_INT:
                 return "int";
             case TYPE_FLOAT:
