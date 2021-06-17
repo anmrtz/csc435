@@ -43,21 +43,21 @@ program returns [Program p]
 	// executed before the method starts
 	p = new Program();
 }
-        : (f = function {p.addFunction(f);})+ EOF
+        : (f = function {p.addFunction(f);})* EOF
 	;
 
 function returns [Function f]
         : fd = functionDecl fb = functionBody
         {
                 f = new Function(fd, fb);
-                
+                f.setLine(fd.getLine());
         } 
 	;
 
 functionDecl returns [FunctionDecl fd]
-        : tp = compoundType vId = ID '(' (params = formalParameters)? ')'
+        : tp = compoundType vId = id '(' (params = formalParameters)? ')'
         {
-                fd = new FunctionDecl(tp, vId.getText(), params);
+                fd = new FunctionDecl(tp, vId.name, params);
                 fd.setLine(vId.getLine());
         }
 	;
@@ -80,7 +80,10 @@ functionBody returns [FunctionBody fb]
 
 varDecl returns [VarDecl vd]
         : tp = compoundType vId = id    
-        {vd = new VarDecl(tp, vId);}    
+        {
+                vd = new VarDecl(tp, vId);
+                vd.setLine(vId.getLine());
+        }
         ;
 
 block returns [Block b]
@@ -109,37 +112,58 @@ statEmpty       : ';'
 
 statIf returns [StatIf st]         
         : IF '(' condEx = expr ')' ifBlk = block (ELSE elseBlk = block)?
-        {st = new StatIf(condEx, ifBlk, elseBlk);}
+        {
+                st = new StatIf(condEx, ifBlk, elseBlk);
+                st.setLine($IF.getLine());
+        }
         ;
 
 statWhile returns [StatWhile st]     
         : WHILE '(' condEx = expr ')' blk = block
-        {st = new StatWhile(condEx, blk);}
+        {
+                st = new StatWhile(condEx, blk);
+                st.setLine($WHILE.getLine());
+        }
         ;
 
 statPrint returns [StatPrint st]      
         : PRINT e = expr ';'
-        {st = new StatPrint(e,false);}
+        {
+                st = new StatPrint(e,false);
+                st.setLine($PRINT.getLine());
+        }
         ;
 
 statPrintln returns [StatPrint st]    
         : PRINTLN e = expr ';'
-        {st = new StatPrint(e,true);}
+        {
+                st = new StatPrint(e,true);
+                st.setLine($PRINTLN.getLine());
+        }
         ;
 
 statReturn returns [StatReturn st]     
         : RETURN (e = expr)? ';'
-        {st = new StatReturn(e);}
+        {
+                st = new StatReturn(e);
+                st.setLine($RETURN.getLine());
+        }
         ;
 
 statArrAssn returns [StatArrAssn st]    
         : ac = arrayAccess '=' e = expr ';'
-        {st = new StatArrAssn(ac, e);}
+        {
+                st = new StatArrAssn(ac, e);
+                st.setLine(ac.getLine());
+        }
         ;
 
 statAssn returns [StatAssn st]       
         : varName = id '=' e = expr ';'
-        {st = new StatAssn(varName, e);}
+        {
+                st = new StatAssn(varName, e);
+                st.setLine(varName.getLine());
+        }
         ;
 
 statExpr returns [StatExpr st]       
@@ -163,7 +187,11 @@ exprEqualTo returns [Expr e]
         e = temp;
 }
         : el = exprLessThan {temp = el;} 
-        ('==' er = exprLessThan {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_EQUAL_TO,temp,er);})*
+        (OP_EQUAL_TO er = exprLessThan 
+        {
+                temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_EQUAL_TO,temp,er);
+                temp.setLine($OP_EQUAL_TO.getLine());
+        })*
         ;
 
 exprLessThan returns [Expr e]
@@ -176,7 +204,10 @@ exprLessThan returns [Expr e]
         e = temp;
 }
         : el = exprAddSub {temp = el;} 
-        ('<' er = exprAddSub {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_LESS_THAN,temp,er);})*
+        (OP_LESS_THAN er = exprAddSub {
+                temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_LESS_THAN,temp,er);
+                temp.setLine($OP_LESS_THAN.getLine());
+        })*
         ;
 
 exprAddSub returns [Expr e]
@@ -189,8 +220,16 @@ exprAddSub returns [Expr e]
         e = temp;
 }
         : el = exprMult {temp = el;} 
-        (('+' er = exprMult {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_ADD,temp,er);}) 
-        | ('-' er = exprMult {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_SUB,temp,er);}))*
+        ((OP_ADD er = exprMult 
+        {
+                temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_ADD,temp,er);
+                temp.setLine($OP_ADD.getLine());
+        }) 
+        | (OP_SUB er = exprMult 
+        {
+                temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_SUB,temp,er);
+                temp.setLine($OP_SUB.getLine());
+        }))*
         ;
 
 exprMult returns [Expr e]
@@ -203,7 +242,11 @@ exprMult returns [Expr e]
         e = temp;
 }
         : el = atom {temp = el;} 
-        ('*' er = atom {temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_MULT,temp,er);})*
+        (OP_MULT er = atom 
+        {
+                temp = new ExprBinaryOp(ExprBinaryOp.OpType.OP_MULT,temp,er);
+                temp.setLine($OP_MULT.getLine());
+        })*
         ;
 
 atom returns [Expr e]   
@@ -216,11 +259,19 @@ atom returns [Expr e]
         ;
 
 arrayAccess returns [ExprArrAcc ac]    
-        : arrID = id '[' e = expr ']' {ac = new ExprArrAcc(arrID,e);}
+        : arrID = id '[' e = expr ']'
+        {
+                ac = new ExprArrAcc(arrID,e);
+                ac.setLine(arrID.getLine());
+        }
         ;
 
 call returns [ExprFuncCall fc]   
-        : funcID = id '(' el = exprList ')' {fc = new ExprFuncCall(funcID.name, el);}
+        : funcID = id '(' el = exprList ')'
+        {
+                fc = new ExprFuncCall(funcID.name, el);
+                fc.setLine(funcID.getLine());
+        }
         ;
 
 id      returns [ExprIden id]

@@ -27,8 +27,6 @@ public class Compiler {
 			PrintVisitor pv = new PrintVisitor();
 			p.accept(pv);
 
-			System.out.println();
-
 			TypeCheckVisitor tv = new TypeCheckVisitor();
 			p.accept(tv);
 		}
