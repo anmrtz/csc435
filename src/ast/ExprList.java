@@ -1,10 +1,10 @@
 package ast;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class ExprList extends ASTNode {
     
-    public LinkedList<Expr> exprs = new LinkedList<Expr>();
+    public ArrayList<Expr> exprs = new ArrayList<Expr>();
 
     public void addExpr(Expr expr) {
         exprs.add(expr);

@@ -9,7 +9,7 @@ public class Environment<K,V>
 
 	public void beginScope()
 	{
-        scopes.add(new HashMap<K,V>());
+        scopes.push(new HashMap<K,V>());
 	}
 
 	public void endScope()

@@ -10,12 +10,12 @@ public class TypeArr extends Type {
 
     @Override
     public boolean equals(Type other) {
+        if (other instanceof TypeArr) {
+            TypeArr otherArr = (TypeArr)other;
+            return (this.arrSize == otherArr.arrSize) && 
+            (this.atomicType == otherArr.atomicType);
+        }
         return false;
-    }
-
-    public boolean equals(TypeArr other) {
-        return (this.arrSize == other.arrSize) && 
-            (super.atomicType == other.atomicType);
     }
 
     @Override

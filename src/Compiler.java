@@ -24,19 +24,17 @@ public class Compiler {
 		try {
 			Program p = parser.program();
 		
-			PrintVisitor pv = new PrintVisitor();
-			p.accept(pv);
+			//PrintVisitor pv = new PrintVisitor();
+			//p.accept(pv);
 
 			System.out.println();
 
 			TypeCheckVisitor tv = new TypeCheckVisitor();
 			p.accept(tv);
-
-			if (tv.compilerErrors()) {
-				System.err.println("Compiler errors:");
-				tv.printCompilerErrors(System.err);
-				System.exit(1);
-			}
+		}
+		catch (SemanticException e) {
+			System.out.println(e);
+			System.exit(1);
 		}
 		catch (RecognitionException e )	{
 			System.exit(1);

@@ -1,76 +1,16 @@
 package type;
 
-import java.util.*;
-
-import type.Type.AtomicType;
 import ast.*;
-
-import java.io.*;
+import type.Type.AtomicType;
 
 public class TypeCheckVisitor extends Visitor<Type> {
 
-    public static class CompilerError {
-        public final String errMsg;
-        public final ASTNode node;
-
-        public CompilerError(String errMsg, ASTNode node) {
-            this.errMsg = errMsg;
-            this.node = node;
-        }
-
-        // Sort compiler errors based on line/offset
-        public static class LocationComparator implements Comparator<CompilerError> {
-            @Override
-            public int compare(CompilerError arg0, CompilerError arg1) {
-                final int line0 = arg0.node.line;
-                final int off0 = arg0.node.offset;
-                final int line1 = arg1.node.line;
-                final int off1 = arg1.node.offset;
-
-                if (line0 < line1) {
-                    return -1;
-                }
-                else if (line0 > line1) {
-                    return 1;
-                }
-                else {
-                    if (off0 < off1) {
-                        return -1;
-                    }
-                    else if (off0 > off1) {
-                        return 1;
-                    }
-                }
-
-                return 0;
-            }
-        }
-
-        @Override
-        public String toString() {
-            return String.format("[%d:%d] %s",node.line,node.offset,errMsg);
-        }
-    }
-
-    private ArrayList<CompilerError> compilerErrors = new ArrayList<CompilerError>();
-
-    private void raiseError(String errMsg, ASTNode node) {
-        compilerErrors.add(new CompilerError(errMsg, node));
-        compilerErrors.sort(new CompilerError.LocationComparator());
-    }
-
-    public boolean compilerErrors() {
-        return !compilerErrors.isEmpty();
-    }
-
-    public void printCompilerErrors(PrintStream os) {
-        for (CompilerError err : compilerErrors) {
-            os.println(err.toString());
-        }
-    }
-
     private Environment<String,Function> funcDecs = new Environment<String,Function>();
     private Environment<String,Type> varDecs = new Environment<String,Type>();
+
+    private void raiseError(String errMsg, ASTNode node) throws SemanticException {
+        throw new SemanticException(errMsg, node);
+    }
 
     @Override
     public Type visit(Program p) {       
@@ -82,8 +22,6 @@ public class TypeCheckVisitor extends Visitor<Type> {
         funcDecs.beginScope(); 
         boolean mainFound = false;
         for (Function f : p.progFuncs) {
-            f.accept(this);
-
             // Check for duplicate function name
             if (funcDecs.inCurrentScope(f.funcId)) {
                 raiseError("duplicate function name", f);
@@ -118,11 +56,27 @@ public class TypeCheckVisitor extends Visitor<Type> {
         varDecs.beginScope();
 
         for (VarDecl vd : f.funcParams) {
-            vd.accept(this);
+            if (varDecs.inCurrentScope(vd.varName.name)) {
+                raiseError(String.format("variable \"%s\" already defined", vd.varName.name), vd);
+            }
+    
+            if (vd.varType.atomicType == AtomicType.TYPE_VOID) {
+                raiseError("variables must not have type void", vd);
+            }
+ 
+            varDecs.add(vd.varName.name, vd.varType);
         }
 
         for (VarDecl vd : f.funcVars) {
-            vd.accept(this);
+            if (varDecs.inCurrentScope(vd.varName.name)) {
+                raiseError(String.format("variable \"%s\" already defined", vd.varName.name), vd);
+            }
+    
+            if (vd.varType.atomicType == AtomicType.TYPE_VOID) {
+                raiseError("variables must not have type void", vd);
+            }
+
+            varDecs.add(vd.varName.name, vd.varType);
         }
 
         for (Stat st : f.funcStats) {
@@ -143,17 +97,7 @@ public class TypeCheckVisitor extends Visitor<Type> {
 
     @Override
     public Type visit(VarDecl vd) {
-        if (varDecs.inCurrentScope(vd.varName.name)) {
-            raiseError(String.format("variable \"%s\" already defined", vd.varName.name), vd);
-        }
-
-        if (vd.varType.atomicType == AtomicType.TYPE_VOID) {
-            raiseError("variables must not have type void", vd);
-        }
-
-        varDecs.add(vd.varName.name, vd.varType);
-
-        return null;
+        return vd.varType;
     }
 
     @Override
@@ -182,7 +126,6 @@ public class TypeCheckVisitor extends Visitor<Type> {
         }
 
         final Type exprType = st.expr.accept(this);
-
         if (!varType.equals(exprType)) {
             raiseError(String.format("incompatible type for assignment (%s to %s)", exprType, varType), st);
         }
@@ -267,7 +210,7 @@ public class TypeCheckVisitor extends Visitor<Type> {
     @Override
     public Type visit(ExprBinaryOp ex) {
         // TODO Auto-generated method stub
-        return null;
+        return new Type(AtomicType.TYPE_VOID);
     }
 
     @Override
@@ -290,8 +233,8 @@ public class TypeCheckVisitor extends Visitor<Type> {
             final Type funcParamType = function.funcParams.get(i).accept(this);
 
             if (!(callParamType.equals(funcParamType))) {
-                raiseError(String.format("function call parameter type mismatch (%d: %s to %s)",
-                    i, callParamType, funcParamType), ex);            
+                raiseError(String.format("function call parameter type mismatch (%s to %s)",
+                    callParamType, funcParamType), ex);            
             }
         }
 

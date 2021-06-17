@@ -14,7 +14,7 @@ public class ExprLiteral<R> extends Expr {
     public AtomicType getAtomicType() {
         if (literalType.equals(Integer.class))
             return AtomicType.TYPE_INT;
-        else if (literalType.equals(Float.class))
+        else if (literalType.equals(Double.class))
             return AtomicType.TYPE_FLOAT;
         else if (literalType.equals(Character.class))
             return AtomicType.TYPE_CHAR;
@@ -25,7 +25,7 @@ public class ExprLiteral<R> extends Expr {
         else if (literalType.equals(Void.class))
             return AtomicType.TYPE_VOID;
         else
-            return null;
+            throw new RuntimeException("Invalid literal class");
     }
 
     @Override

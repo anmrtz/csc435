@@ -3,7 +3,7 @@ package ast;
 import type.*;
 import java.util.ArrayList;
 
-public class FunctionDecl {
+public class FunctionDecl extends ASTNode {
 
     public Type funcType;
     public String funcId;
@@ -15,5 +15,10 @@ public class FunctionDecl {
         if (params != null) {
             funcParams.addAll(params);
         }
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> v) {
+        return null;
     }   
 }

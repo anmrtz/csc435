@@ -48,12 +48,18 @@ program returns [Program p]
 
 function returns [Function f]
         : fd = functionDecl fb = functionBody
-        {f = new Function(fd, fb);}
+        {
+                f = new Function(fd, fb);
+                
+        } 
 	;
 
 functionDecl returns [FunctionDecl fd]
-        : tp = compoundType vId = id '(' (params = formalParameters)? ')'
-        {fd = new FunctionDecl(tp, vId.name, params);}
+        : tp = compoundType vId = ID '(' (params = formalParameters)? ')'
+        {
+                fd = new FunctionDecl(tp, vId.getText(), params);
+                fd.setLine(vId.getLine());
+        }
 	;
 
 formalParameters returns [ArrayList<VarDecl> params]
@@ -219,7 +225,10 @@ call returns [ExprFuncCall fc]
 
 id      returns [ExprIden id]
         : name = ID
-        {id = new ExprIden(name.getText());}
+        {
+                id = new ExprIden(name.getText());
+                id.setLine(name.getLine());
+        }
         ;
 
 exprList returns [ExprList el]       
@@ -235,28 +244,34 @@ literal returns [ExprLiteral l]
                 {
                         int i = Integer.parseInt(val.getText());
                         l = new ExprLiteral<Integer>(Integer.class, i);
+                        l.setLine(val.getLine());
                 }
         | val = CONST_CHAR 
                 {
                         char c = val.getText().charAt(1);
                         l = new ExprLiteral<Character>(Character.class, c);
+                        l.setLine(val.getLine());
                 }
         | val = CONST_STRING 
                 {
                         l = new ExprLiteral<String>(String.class, val.getText());
+                        l.setLine(val.getLine());
                 }
         | val = CONST_FLOAT 
                 {
                         double d = Double.parseDouble(val.getText());
                         l = new ExprLiteral<Double>(Double.class, d);
+                        l.setLine(val.getLine());
                 }
         | val = TRUE 
                 {
                         l = new ExprLiteral<Boolean>(Boolean.class, true);
+                        l.setLine(val.getLine());
                 }
         | val = FALSE
                 {
                         l = new ExprLiteral<Boolean>(Boolean.class, false);
+                        l.setLine(val.getLine());
                 }
         ;
 
