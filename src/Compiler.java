@@ -24,8 +24,8 @@ public class Compiler {
 		try {
 			Program p = parser.program();
 		
-			//PrintVisitor pv = new PrintVisitor();
-			//p.accept(pv);
+			PrintVisitor pv = new PrintVisitor();
+			p.accept(pv);
 
 			System.out.println();
 

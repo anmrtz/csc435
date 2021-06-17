@@ -15,9 +15,7 @@ void main() {
     char c;
     char[3] str;
 
-    i = foo();
-    i = bar(foo());
-
-    c[2] = 'a';
+    
+    str[2] = 'a';
     c = bar2(str);
 }
