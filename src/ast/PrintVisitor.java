@@ -124,12 +124,10 @@ public class PrintVisitor extends Visitor<Void> {
         st.condExpr.accept(this);
         print(")\n");
         st.ifBlock.accept(this);
-        print("\n");
         if (st.elseBlock != null) {
             tab();
             print("else\n");
             st.elseBlock.accept(this);
-            print("\n");
         }
 
         return null;
@@ -146,8 +144,9 @@ public class PrintVisitor extends Visitor<Void> {
 
     @Override
     public Void visit(StatReturn st) {
-        print("return ");
+        print("return");
         if (st.expr != null) {
+            print(" ");
             st.expr.accept(this);
         }
         print(";");
@@ -161,7 +160,6 @@ public class PrintVisitor extends Visitor<Void> {
         st.condExpr.accept(this);
         print(")\n");
         st.whileBlock.accept(this);
-        print("\n");
 
         return null;
     }

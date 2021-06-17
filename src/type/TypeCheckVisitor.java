@@ -168,19 +168,19 @@ public class TypeCheckVisitor extends Visitor<Type> {
 
     @Override
     public Type visit(StatReturn st) {
-        if (st.expr == null) {
-            return null;
-        }
-        
-        final Type returnType = st.expr.accept(this);
+        final Type scopeFunctionType = environment.getScopeFunction().funcType;
 
         // Check that return type matches function type
-        if (returnType.atomicType != AtomicType.TYPE_VOID) {
-            final Function scopeFunction = environment.getScopeFunction();
+        if (scopeFunctionType.atomicType != AtomicType.TYPE_VOID) {
+            if (st.expr == null) {
+                raiseError(String.format("void return in non-void function (%s)",
+                    scopeFunctionType), st);
+            }    
 
-            if (!returnType.equals(scopeFunction.funcType)) {
+            final Type returnType = st.expr.accept(this);
+            if (!returnType.equals(scopeFunctionType)) {
                 raiseError(String.format("return type does not match function type (%s to %s)", 
-                    returnType, scopeFunction.funcType), st);
+                    returnType, scopeFunctionType), st);
             }
         }
 

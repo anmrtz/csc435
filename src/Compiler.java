@@ -32,7 +32,7 @@ public class Compiler {
 		}
 		catch (SemanticException e) {
 			System.out.println(e);
-			System.exit(1);
+			System.exit(2);
 		}
 		catch (RecognitionException e )	{
 			System.exit(1);
