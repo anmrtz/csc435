@@ -21,6 +21,10 @@ public class ExprBinaryOp extends Expr {
     }
 
     public String getOpString() {
+        return getOpString(this.opType);
+    }
+
+    public static String getOpString(OpType opType) {
         switch (opType) {
             case OP_LESS_THAN:
                 return "<";

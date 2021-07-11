@@ -1,5 +1,7 @@
 package ir;
 
+import type.Type;
+
 public class InstArrInit implements Instruction {
     TempVar arr;
     int arrSize;
@@ -11,6 +13,7 @@ public class InstArrInit implements Instruction {
 
     @Override
     public String toString() {
-        return arr.toString() + " := NEWARRAY " + arr.varType.toIRString() + " " + Integer.toString(arrSize);
+        Type aType = new Type(arr.varType.atomicType);
+        return arr.toString() + " := NEWARRAY " + aType.toIRString() + " " + Integer.toString(arrSize);
     }
 }

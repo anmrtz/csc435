@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class IRProgram {
     public ArrayList<IRFunction> functions = new ArrayList<IRFunction>();
+
     public final String name;
 
     public IRProgram(String name) {

@@ -1,6 +1,8 @@
 package ir;
 
-public class InstLiteralAssn<R> implements Instruction, Operand {
+import type.Type;
+
+public class InstLiteralAssn<R> implements Instruction {
     public final Class<R> literalType;
     public R value;
 
@@ -8,11 +10,21 @@ public class InstLiteralAssn<R> implements Instruction, Operand {
 
     public InstLiteralAssn(Class<R> literalType, TempVar temp, R value) {
         this.literalType = literalType;
+        this.temp = temp;
         this.value = value;
     }
 
     @Override
     public String toString() {
-        return temp.toString() + " " + temp.varType.toIRString() + " := " + value;
+        String s = temp.toString() + " := ";
+
+        if (temp.varType.atomicType.equals(Type.AtomicType.TYPE_CHAR)) {
+            s += "\'" + value + "\'";
+        }
+        else {
+            s += value;
+        }
+
+        return s;
     }
 }

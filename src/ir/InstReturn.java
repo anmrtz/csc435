@@ -13,7 +13,7 @@ public class InstReturn implements Instruction {
         if (retValue != null) {
             s += " " + retValue.toString();
         }
-        s += ";";
+
         return s;
     }
 }

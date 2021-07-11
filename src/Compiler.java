@@ -2,6 +2,8 @@ import org.antlr.runtime.*;
 import java.io.*;
 
 import ast.*;
+import ir.IRProgram;
+import ir.IRVisitor;
 import type.*;
 
 public class Compiler {
@@ -24,11 +26,16 @@ public class Compiler {
 		try {
 			Program p = parser.program();
 		
-			//PrintVisitor pv = new PrintVisitor();
-			//p.accept(pv);
+			PrintVisitor pv = new PrintVisitor();
+			p.accept(pv);
 
 			TypeCheckVisitor tv = new TypeCheckVisitor();
 			p.accept(tv);
+
+			IRVisitor ir = new IRVisitor(args[0].split("\\.(?=[^\\.]+$)")[0]); 
+			p.accept(ir);
+			IRProgram irp = ir.program;
+			System.out.print(irp.toString());
 		}
 		catch (SemanticException e) {
 			System.out.println(e);

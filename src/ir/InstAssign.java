@@ -1,6 +1,6 @@
 package ir;
 
-public class InstAssign implements Instruction, Operand {
+public class InstAssign implements Instruction {
     public TempVar left, right;
 
     public InstAssign(TempVar left, TempVar right) {
@@ -10,6 +10,6 @@ public class InstAssign implements Instruction, Operand {
 
     @Override
     public String toString() {
-        return left.toString() + " " + left.varType.toIRString() + " := " + right.toString();
+        return left.toString() + " := " + right.toString();
     }
 }
