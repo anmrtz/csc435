@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class TypeCheckVisitor extends Visitor<Type> {
 
     private HashMap<String,Function> funcDecs = new HashMap<String,Function>();
-    private Environment<String,Type> environment = new Environment<String,Type>();
+    private Environment<String,Type,Function> environment = new Environment<String,Type,Function>();
 
     private void raiseError(String errMsg, ASTNode node) throws SemanticException {
         throw new SemanticException(errMsg, node);

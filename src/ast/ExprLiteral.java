@@ -3,7 +3,7 @@ package ast;
 import type.Type.AtomicType;
 
 public class ExprLiteral<R> extends Expr {
-    private final Class<R> literalType;
+    public final Class<R> literalType;
     public R value;
 
     public ExprLiteral(Class<R> literalType, R value) {

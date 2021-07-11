@@ -3,21 +3,19 @@ package type;
 import java.util.HashMap;
 import java.util.Stack;
 
-import ast.Function;
-
-public class Environment<K,V>
+public class Environment<K,V,F>
 {
 	private class Scope extends HashMap<K,V> {
-		final public Function scopeFunction;
+		final public F scopeFunction;
 
-		public Scope(Function scopeFunction) {
+		public Scope(F scopeFunction) {
 			this.scopeFunction = scopeFunction;
 		}
 	}
 
     private Stack<Scope> scopes = new Stack<Scope>();
 
-	public void beginScope(Function function)
+	public void beginScope(F function)
 	{
         scopes.push(new Scope(function));
 	}
@@ -27,7 +25,7 @@ public class Environment<K,V>
         scopes.pop();
 	}
 
-	public Function getScopeFunction() {
+	public F getScopeFunction() {
 		return scopes.peek().scopeFunction;
 	}
 

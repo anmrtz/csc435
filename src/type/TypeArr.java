@@ -22,4 +22,9 @@ public class TypeArr extends Type {
     public String toString() {
         return super.toString() + '[' + arrSize + ']';
     }
+
+    @Override
+    public String toIRString() {
+        return "A" + super.toIRString();
+    }
 }
