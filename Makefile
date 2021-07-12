@@ -2,7 +2,7 @@
 GNAME= ul
 GSRC= $(GNAME).g
 
-all: grammar compiler test
+all: grammar compiler
 
 grammar: $(GSRCS)
 	java -cp "./antlr3.jar" org.antlr.Tool -fo ./src/ ./src/$(GSRC) 
@@ -12,10 +12,10 @@ compiler:
 
 .PHONY: test
 
-test:
+#test:
 #	(cd ./test; ./ul-test.sh)
 #	(cd ./test; ./type-check-test.sh)
-	(cd ./test; ./ir-test.sh)
+#	(cd ./test; ./ir-test.sh)
 
 clean:
 	@-rm ./src/$(GNAME)*.java ./src/$(GNAME).tokens

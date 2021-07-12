@@ -46,7 +46,7 @@ public class IRFunction {
             s += inst.toString() + ";\n";
         }
 
-        s += "}\n";
+        s += "}";
 
         return s;
     }

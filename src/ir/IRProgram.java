@@ -1,6 +1,7 @@
 package ir;
 
 import java.util.ArrayList;
+import java.util.StringJoiner;
 
 public class IRProgram {
     public ArrayList<IRFunction> functions = new ArrayList<IRFunction>();
@@ -19,10 +20,11 @@ public class IRProgram {
     public String toString() {
         String s = "PROG " + name + "\n";
 
+        StringJoiner sj = new StringJoiner("\n\n");
         for (IRFunction func : functions) {
-            s += func.toString();
-            s += "\n";
+            sj.add(func.toString());
         }
+        s += sj.toString() + "\n";
 
         return s;
     }
