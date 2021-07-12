@@ -13,11 +13,14 @@ compiler:
 .PHONY: test
 
 test:
-#	cd ./test; ./ul-test.sh
-#	cd ./test; ./type-check-test.sh
-	cd ./test; ./ir-test.sh
+#	(cd ./test; ./ul-test.sh)
+#	(cd ./test; ./type-check-test.sh)
+	(cd ./test; ./ir-test.sh)
 
 clean:
-	rm ./src/$(GNAME)*.java ./src/$(GNAME).tokens
-	rm -r ./build
-	rm -r ./src/output
+	@-rm ./src/$(GNAME)*.java ./src/$(GNAME).tokens
+	@-rm -r ./build
+	@-rm -r ./src/output
+	@-rm ./test/ul-accepted-valid/*.ir
+	@-rm ./test/ul-accepted-valid/*.j	
+	@-rm ./test/ul-accepted-valid/*.class

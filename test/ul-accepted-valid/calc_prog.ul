@@ -21,19 +21,22 @@ boolean isLessThan(int l, int r) {
 
 void printFibonacci(int n) {
     int i;
+
     int[3] f;
 
-    f[0] = 1;
-    f[1] = 2;
+    f[0] = 0;
+    f[1] = 1;
+    println 0;
+    println 1;
 
     i = 2;
 
     while (i < n) {
-        f[i] = f[i-1] + f[1-2];
-        println f[i];
+        f[2] = f[0] + f[1];
+        println f[2];
 
-        f[i - 2] = f[i - 1];
-        f[i - 1] = f[i];
+        f[0] = f[1];
+        f[1] = f[2];
         
         i = i + 1;
     }
@@ -52,8 +55,8 @@ void main() {
     int j;
     string title;
 
-    i = 2;
-    j = 1;
+    i = 5;
+    j = 3;
 
     title = "Calculator program";
 
@@ -83,7 +86,7 @@ void main() {
     print "Is 7 equal to 7: ";
     println isSeven(7);
 
-    i = 6;
+    i = 20;
     print "Fibonacci sequence for n "; print i; println ':';
     printFibonacci(i);
 }

@@ -25,6 +25,6 @@ public class TempVar implements Operand {
     }
 
     public String toString() {
-        return ((tempType == TempType.PARAM) ? "P" : "T") + id;
+        return "T" + id;
     }
 }

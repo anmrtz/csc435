@@ -58,6 +58,7 @@ public class IRVisitor extends Visitor<TempVar> {
     public TempVar visit(Function f) {        
         IRFunction irFunc = new IRFunction(f.funcId, f.funcType);
         environment.beginScope(irFunc);
+        labelCount = 0;
 
         for (VarDecl vd : f.funcParams) {
             TempVar t = getTempAllocator().allocate(vd.varType, TempType.PARAM, vd.varName.name);
