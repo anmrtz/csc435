@@ -26,13 +26,14 @@ public class Compiler {
 		try {
 			Program p = parser.program();
 		
-			PrintVisitor pv = new PrintVisitor();
-			p.accept(pv);
+			//PrintVisitor pv = new PrintVisitor();
+			//p.accept(pv);
 
 			TypeCheckVisitor tv = new TypeCheckVisitor();
 			p.accept(tv);
 
-			IRVisitor ir = new IRVisitor(args[0].split("\\.(?=[^\\.]+$)")[0]); 
+			String path = args[0];
+			IRVisitor ir = new IRVisitor(path.substring(path.lastIndexOf('/')+1,path.lastIndexOf('.'))); 
 			p.accept(ir);
 			IRProgram irp = ir.program;
 			System.out.print(irp.toString());

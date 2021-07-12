@@ -1,6 +1,5 @@
 package ir;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import ast.*;
@@ -8,7 +7,6 @@ import ir.InstUnary.OpType;
 import ir.TempVar.TempType;
 import type.Type;
 import type.TypeArr;
-import type.Type.AtomicType;
 import type.Environment;
 
 public class IRVisitor extends Visitor<TempVar> {
