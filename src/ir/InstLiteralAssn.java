@@ -21,6 +21,9 @@ public class InstLiteralAssn<R> implements Instruction {
         if (temp.varType.atomicType.equals(Type.AtomicType.TYPE_CHAR)) {
             s += "\'" + value + "\'";
         }
+        else if (temp.varType.atomicType.equals(Type.AtomicType.TYPE_BOOL)) {
+            s += value.toString().toUpperCase();
+        }
         else {
             s += value;
         }

@@ -1,0 +1,12 @@
+void main() {
+print "Printing 1..10";
+forLoop(1, 10);
+}
+void forLoop(int start, int stop) {
+int i;
+i = start;
+while (i < stop) {
+print i;
+i = i + 1;
+}
+}

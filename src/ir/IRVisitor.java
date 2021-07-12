@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ast.*;
+import ir.InstUnary.OpType;
 import ir.TempVar.TempType;
 import type.Type;
 import type.TypeArr;
@@ -14,7 +15,14 @@ public class IRVisitor extends Visitor<TempVar> {
     private HashMap<String,Type> funcRetTypes = new HashMap<String,Type>();
     private Environment<String,TempVar,IRFunction> environment = new Environment<String,TempVar,IRFunction>();
 
+    private int labelCount = 0;
+
     public IRProgram program;
+
+    // Allocate a new GOTO label
+    private InstLabel allocateLabel() {
+        return new InstLabel(labelCount++);
+    }
 
     // Add new instruction to current function
     private void addInstruction(Instruction inst) {
@@ -74,6 +82,10 @@ public class IRVisitor extends Visitor<TempVar> {
 
         for (Stat st : f.funcStats) {
             st.accept(this);
+        }
+
+        if (f.funcType.atomicType.equals(Type.AtomicType.TYPE_VOID)) {
+            addInstruction(new InstReturn(null));
         }
 
         environment.endScope();
@@ -146,7 +158,28 @@ public class IRVisitor extends Visitor<TempVar> {
 
     @Override
     public TempVar visit(StatIf st) {
-        // TODO Auto-generated method stub
+        TempVar condCheck = st.condExpr.accept(this);
+
+        InstLabel labelEndIf = allocateLabel(); 
+
+        addInstruction(new InstUnary(condCheck, OpType.OP_INVERT));
+        addInstruction(new InstJump(labelEndIf, condCheck));
+
+        st.ifBlock.accept(this);
+
+        if (st.elseBlock != null) {
+            InstLabel labelEndElse = allocateLabel();
+            addInstruction(new InstJump(labelEndElse, null)); 
+            addInstruction(labelEndIf);
+
+            st.elseBlock.accept(this);
+            
+            addInstruction(labelEndElse);
+        }
+        else {
+            addInstruction(labelEndIf);
+        }
+
         return null;
     }
 
@@ -176,7 +209,20 @@ public class IRVisitor extends Visitor<TempVar> {
 
     @Override
     public TempVar visit(StatWhile st) {
-        // TODO Auto-generated method stub
+        InstLabel labelCondCheck = allocateLabel(); 
+        InstLabel labelWhileEnd = allocateLabel();
+
+        addInstruction(labelCondCheck);
+        TempVar condCheck = st.condExpr.accept(this);
+
+        addInstruction(new InstUnary(condCheck, OpType.OP_INVERT));
+        addInstruction(new InstJump(labelWhileEnd, condCheck));
+
+        st.whileBlock.accept(this);
+        addInstruction(new InstJump(labelCondCheck, null));
+
+        addInstruction(labelWhileEnd);        
+
         return null;
     }
 
@@ -208,7 +254,16 @@ public class IRVisitor extends Visitor<TempVar> {
         TempVar left = ex.el.accept(this);
         TempVar right = ex.er.accept(this);
 
-        TempVar dest = getTempAllocator().allocate(left.varType, TempType.INTERMED, null);
+        Type destType = null;
+        if (ex.opType.equals(ExprBinaryOp.OpType.OP_EQUAL_TO) 
+            || ex.opType.equals(ExprBinaryOp.OpType.OP_LESS_THAN)) {
+            destType = new Type(Type.AtomicType.TYPE_BOOL);
+        }
+        else {
+            destType = left.varType;
+        }
+
+        TempVar dest = getTempAllocator().allocate(destType, TempType.INTERMED, null);
         addTemporary(dest);
 
         InstBinaryOp ir = new InstBinaryOp(dest, left, right, ex.opType);
