@@ -2,7 +2,7 @@ package ir;
 
 import type.Type;
 
-public class TempVar implements Operand {
+public class TempVar {
 
     public enum TempType {
         LOCAL,
