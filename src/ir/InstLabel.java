@@ -1,6 +1,8 @@
 package ir;
 
-public class InstLabel implements Instruction {
+import codegen.JVisitor;
+
+public class InstLabel extends Instruction {
     public final int labelId;
 
     public InstLabel(int labelId) {
@@ -10,5 +12,10 @@ public class InstLabel implements Instruction {
     @Override
     public String toString() {
         return "L" + labelId + ":";
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

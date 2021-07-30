@@ -27,4 +27,9 @@ public class TypeArr extends Type {
     public String toIRString() {
         return "A" + super.toIRString();
     }
+
+    @Override
+    public String toJString() {
+        return "[" + super.toJString();
+    }
 }

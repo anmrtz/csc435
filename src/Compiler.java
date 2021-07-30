@@ -5,6 +5,7 @@ import ast.*;
 import ir.IRProgram;
 import ir.IRVisitor;
 import type.*;
+import codegen.*;
 
 public class Compiler {
 	public static void main (String[] args) throws Exception {
@@ -36,7 +37,10 @@ public class Compiler {
 			IRVisitor ir = new IRVisitor(path.substring(path.lastIndexOf('/')+1,path.lastIndexOf('.'))); 
 			p.accept(ir);
 			IRProgram irp = ir.program;
-			System.out.print(irp.toString());
+			System.out.println(irp.toString());
+
+			JVisitor jv = new JVisitor(irp);
+			System.out.println(jv.getJCode());
 		}
 		catch (SemanticException e) {
 			System.out.println(e);

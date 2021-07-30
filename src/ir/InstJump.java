@@ -1,6 +1,8 @@
 package ir;
 
-public class InstJump implements Instruction {
+import codegen.JVisitor;
+
+public class InstJump extends Instruction {
     public TempVar condVar = null; // If null, then jump is uncoditional GOTO
     public InstLabel label;
 
@@ -19,5 +21,10 @@ public class InstJump implements Instruction {
         s += "GOTO " + "L" + label.labelId;
         
         return s;
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

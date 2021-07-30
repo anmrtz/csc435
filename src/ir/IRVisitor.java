@@ -10,7 +10,6 @@ import type.TypeArr;
 import type.Environment;
 
 public class IRVisitor extends Visitor<TempVar> {
-    private HashMap<String,Type> funcRetTypes = new HashMap<String,Type>();
     private Environment<String,TempVar,IRFunction> environment = new Environment<String,TempVar,IRFunction>();
 
     private int labelCount = 0;
@@ -44,7 +43,7 @@ public class IRVisitor extends Visitor<TempVar> {
     @Override
     public TempVar visit(Program p) {
         for (Function f : p.progFuncs) {
-            funcRetTypes.put(f.funcId, f.funcType);
+            program.funcRetTypes.put(f.funcId, f.funcType);
         }
 
         for (Function f : p.progFuncs) {
@@ -273,7 +272,7 @@ public class IRVisitor extends Visitor<TempVar> {
 
     @Override
     public TempVar visit(ExprFuncCall ex) {
-        Type retType = funcRetTypes.get(ex.funcId);
+        Type retType = program.funcRetTypes.get(ex.funcId);
         InstCall ir = null;
         TempVar assignee = null;
         if (!retType.equals(new Type(Type.AtomicType.TYPE_VOID))) {

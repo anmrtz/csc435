@@ -2,8 +2,9 @@ package ir;
 
 import java.util.ArrayList;
 import java.util.StringJoiner;
+import codegen.JVisitor;
 
-public class InstCall implements Instruction {
+public class InstCall extends Instruction {
     public final String funcName;
     public ArrayList<TempVar> params = new ArrayList<TempVar>();
     public TempVar assignee; // null if call result is not assigned to anything
@@ -29,5 +30,10 @@ public class InstCall implements Instruction {
         s += sj.toString() + ")";
 
         return s;
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

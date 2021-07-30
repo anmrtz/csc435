@@ -1,6 +1,8 @@
 package ir;
 
-public class InstArrAssn implements Instruction {
+import codegen.JVisitor;
+
+public class InstArrAssn extends Instruction {
     public TempVar destArr, destIdx, value;
 
     public InstArrAssn(TempVar destArr, TempVar destIdx, TempVar value) {
@@ -12,5 +14,10 @@ public class InstArrAssn implements Instruction {
     @Override
     public String toString() {
         return destArr.toString() + "[" + destIdx.toString() + "] := " + value.toString();
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

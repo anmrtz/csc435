@@ -1,8 +1,9 @@
 package ir;
 
 import type.Type;
+import codegen.JVisitor;
 
-public class InstLiteralAssn<R> implements Instruction {
+public class InstLiteralAssn<R> extends Instruction {
     public final Class<R> literalType;
     public R value;
 
@@ -29,5 +30,10 @@ public class InstLiteralAssn<R> implements Instruction {
         }
 
         return s;
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

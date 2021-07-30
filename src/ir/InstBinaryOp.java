@@ -1,8 +1,10 @@
 package ir;
+
 import ast.ExprBinaryOp;
 import ast.ExprBinaryOp.OpType;
+import codegen.JVisitor;
 
-public class InstBinaryOp implements Instruction {
+public class InstBinaryOp extends Instruction {
     public TempVar dest, left, right;
     public OpType opType;
 
@@ -17,5 +19,10 @@ public class InstBinaryOp implements Instruction {
     @Override
     public String toString() {
         return dest.toString() + " := " + left.toString() + " " + left.varType.toIRString() + ExprBinaryOp.getOpString(opType) + " " + right.toString();
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

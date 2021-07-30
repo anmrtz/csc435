@@ -12,10 +12,11 @@ compiler:
 
 .PHONY: test
 
-#test:
+test:
 #	(cd ./test; ./ul-test.sh)
 #	(cd ./test; ./type-check-test.sh)
-#	(cd ./test; ./ir-test.sh)
+	(cd ./test; ./ir-test.sh)
+#	(cd ./test; ./j-test.sh)
 
 clean:
 	@-rm ./src/$(GNAME)*.java ./src/$(GNAME).tokens

@@ -1,6 +1,8 @@
 package ir;
 
-public class InstAssign implements Instruction {
+import codegen.JVisitor;
+
+public class InstAssign extends Instruction {
     public TempVar left, right;
 
     public InstAssign(TempVar left, TempVar right) {
@@ -11,5 +13,10 @@ public class InstAssign implements Instruction {
     @Override
     public String toString() {
         return left.toString() + " := " + right.toString();
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

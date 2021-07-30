@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 import ir.TempVar.TempType;
 import type.Type;
+import codegen.JVisitor;
 
-public class IRFunction {
+public class IRFunction extends IRNode {
     public final String name;
     public final Type returnType;
 
@@ -49,5 +50,10 @@ public class IRFunction {
         s += "}";
 
         return s;
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

@@ -1,6 +1,8 @@
 package ir;
 
-public class InstUnary implements Instruction {
+import codegen.JVisitor;
+
+public class InstUnary extends Instruction {
     static public enum OpType {
         OP_NEGATE,
         OP_INVERT
@@ -26,5 +28,10 @@ public class InstUnary implements Instruction {
     @Override 
     public String toString() {
         return temp.toString() + " := " + temp.varType.toIRString() + getOpString() + " " + temp.toString();
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

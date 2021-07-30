@@ -1,7 +1,9 @@
 package ir;
 
-public class InstReturn implements Instruction {
-    TempVar retValue = null;
+import codegen.JVisitor;
+
+public class InstReturn extends Instruction {
+    public TempVar retValue = null;
 
     public InstReturn(TempVar retValue) {
         this.retValue = retValue;
@@ -15,5 +17,10 @@ public class InstReturn implements Instruction {
         }
 
         return s;
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

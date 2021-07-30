@@ -1,8 +1,9 @@
 package ir;
 
 import type.Type;
+import codegen.JVisitor;
 
-public class InstPrint implements Instruction {
+public class InstPrint extends Instruction {
     public TempVar temp;
     public final boolean newLine;
 
@@ -27,5 +28,10 @@ public class InstPrint implements Instruction {
         s += " " + temp.toString();
 
         return s;
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }

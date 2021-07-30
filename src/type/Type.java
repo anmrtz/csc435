@@ -83,4 +83,23 @@ public class Type {
                 return null;
         }
     }
+
+    public String toJString() {
+        switch (atomicType) {
+            case TYPE_INT:
+                return "I";
+            case TYPE_FLOAT:
+                return "F";
+            case TYPE_CHAR:
+                return "C";
+            case TYPE_STRING:
+                return "Ljava/lang/String;";
+            case TYPE_BOOL:
+                return "Z";
+            case TYPE_VOID:
+                return "V";
+            default:
+                return null;
+        }
+    }
 }

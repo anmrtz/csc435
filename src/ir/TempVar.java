@@ -1,8 +1,9 @@
 package ir;
 
 import type.Type;
+import codegen.JVisitor;
 
-public class TempVar {
+public class TempVar extends IRNode {
 
     public enum TempType {
         LOCAL,
@@ -26,5 +27,10 @@ public class TempVar {
 
     public String toString() {
         return "T" + id;
+    }
+
+    @Override
+    public void accept(JVisitor j) {
+        j.visit(this);
     }
 }
