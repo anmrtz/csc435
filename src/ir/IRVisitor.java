@@ -1,7 +1,5 @@
 package ir;
 
-import java.util.HashMap;
-
 import ast.*;
 import ir.InstUnary.OpType;
 import ir.TempVar.TempType;
