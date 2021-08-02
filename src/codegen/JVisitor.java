@@ -1,6 +1,7 @@
 package codegen;
 
 import ir.*;
+import ir.TempVar.TempType;
 import type.*;
 import type.Type.AtomicType;
 import ast.ExprBinaryOp.OpType;
@@ -70,7 +71,7 @@ public class JVisitor {
         appendln(".method public <init>()V");
         tab();
         appendln("aload_0");
-        appendln("invokevirtual java/lang/Object/<init>()V");
+        appendln("invokenonvirtual java/lang/Object/<init>()V");
         appendln("return");
         untab();
         appendln(".end method\n");
@@ -78,7 +79,7 @@ public class JVisitor {
 
     public void visit(IRFunction ir) {
         append(".method public static ");
-        append(((ir.name == "main") ? "__main" : ir.name) + "(");
+        append(((ir.name.equals("main")) ? "__main" : ir.name) + "(");
         
         for (Type t : ir.paramTypes) {
             append(t.toJString());
@@ -88,7 +89,28 @@ public class JVisitor {
         tab();
         appendln(".limit locals " + ir.temps.size());
         appendln(".limit stack  16");
-
+/*
+        for (TempVar temp : ir.temps) {
+            if (temp.tempType != TempType.PARAM) {
+                Type type = temp.varType;
+                // Array or string
+                if ((type instanceof TypeArr) || 
+                    (type.atomicType == AtomicType.TYPE_STRING)) {
+                        appendln("aconst_null");
+                        appendln("astore " + temp.id);
+                    }
+                else if (type.atomicType == AtomicType.TYPE_FLOAT) {
+                    appendln("ldc 0.0");
+                    appendln("fstore " + temp.id);
+                }
+                // int, char, bool
+                else {
+                    appendln("ldc 0");
+                    appendln("istore " + temp.id);
+                }
+            }
+        }
+*/
         cmpLabelCount = 0;
         for (Instruction inst : ir.instructions) {
             inst.accept(this);;
@@ -235,9 +257,9 @@ public class JVisitor {
             temp.accept(this);
         }
 
-        append("invokestatic " + this.program.name + "/(");
+        append("invokestatic " + this.program.name + "/" + ir.funcName + "(");
         for (TempVar temp : ir.params) {
-            temp.varType.toJString();
+            append(temp.varType.toJString(), false);
         }
         appendln(")" + this.program.funcRetTypes.get(ir.funcName).toJString(), false);
 
