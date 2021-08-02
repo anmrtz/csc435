@@ -37,7 +37,7 @@ public class Compiler {
 			IRVisitor ir = new IRVisitor(path.substring(path.lastIndexOf('/')+1,path.lastIndexOf('.'))); 
 			p.accept(ir);
 			IRProgram irp = ir.program;
-			System.out.println(irp.toString());
+			//System.out.println(irp.toString());
 
 			JVisitor jv = new JVisitor(irp);
 			System.out.println(jv.getJCode());

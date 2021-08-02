@@ -10,8 +10,8 @@ for f in ./*.ul; do
     echo "Testing $f file... "
     echo "----------------------------------------------"
     b=${f%.*}
-    java -cp "../../antlr3.jar:../../build" Compiler $f
-    #jasmin $b.j
+    java -cp "../../antlr3.jar:../../build" Compiler $f > $b.j
+    jasmin $b.j
     if [ $? -eq 0 ]
     then
         echo -e "${GREEN}PASS - No type errors detected in valid file${NC}"

@@ -9,7 +9,7 @@ public class JVisitor {
     private StringBuilder sb = new StringBuilder();
 
     private IRProgram program;
-    private int labelCount = 0;
+    private int cmpLabelCount = 0;
 
     private boolean indent = false;
 
@@ -25,8 +25,16 @@ public class JVisitor {
         sb.append((indent ? "\t" : "") + s);
     }
 
+    private void append(String s, boolean indent) {
+        sb.append((indent ? "\t" : "") + s);
+    }
+
     private void appendln(String s) {
         append(s + "\n");
+    }
+
+    private void appendln(String s, boolean indent) {
+        append(s + "\n", indent);
     }
 
     public JVisitor(IRProgram program) {
@@ -81,6 +89,7 @@ public class JVisitor {
         appendln(".limit locals " + ir.temps.size());
         appendln(".limit stack  16");
 
+        cmpLabelCount = 0;
         for (Instruction inst : ir.instructions) {
             inst.accept(this);;
             append("\n");
@@ -180,14 +189,45 @@ public class JVisitor {
         else if (ir.opType.equals(OpType.OP_MULT)) {
             appendln(typeChar + "mul");
         }
-        else if (ir.opType.equals(OpType.OP_LESS_THAN)) {
-            
-        }
-        else if (ir.opType.equals(OpType.OP_EQUAL_TO)) {
-            
+        else if (ir.opType.equals(OpType.OP_LESS_THAN)
+            || ir.opType.equals(OpType.OP_EQUAL_TO)) {
+
+            if (type.atomicType == AtomicType.TYPE_FLOAT) {
+                appendln("fcmpg");
+            }
+            else {
+                appendln("isub");
+            }
+
+            cmpLabelCount += 2;
+            if (ir.opType.equals(OpType.OP_LESS_THAN)) {
+                append("iflt L_");
+            }
+            else {
+                append("ifeq L_");                
+            }
+            append((cmpLabelCount-1) + "\n", false);
+
+            appendln("ldc 0");
+            appendln("goto L_" + cmpLabelCount);
+            appendln("L_" + (cmpLabelCount-1) + ":", false);
+            appendln("ldc 1");
+            appendln("L_" + cmpLabelCount + ":", false);
         }
 
-        // TODO: Store result to assignee
+        Type destType = ir.dest.varType;
+        // Array or string
+        if ((destType instanceof TypeArr) || 
+            (destType.atomicType == AtomicType.TYPE_STRING)) {
+            appendln("astore " + ir.dest.id);
+        }
+        else if (destType.atomicType == AtomicType.TYPE_FLOAT) {
+            appendln("fstore " + ir.dest.id);
+        }
+        // int, char, bool
+        else {
+            appendln("istore " + ir.dest.id);
+        }
     }
 
     public void visit(InstCall ir) {
@@ -199,7 +239,7 @@ public class JVisitor {
         for (TempVar temp : ir.params) {
             temp.varType.toJString();
         }
-        appendln(")" + this.program.funcRetTypes.get(ir.funcName).toJString());
+        appendln(")" + this.program.funcRetTypes.get(ir.funcName).toJString(), false);
 
         if (ir.assignee != null) {
             Type type = ir.assignee.varType;
@@ -223,16 +263,16 @@ public class JVisitor {
         TempVar cond = ir.condVar;
 
         if (cond == null) {
-            appendln("goto " + ir.label.toString());
+            appendln("goto L" + ir.label.labelId);
         }
         else {
             cond.accept(this);;
-            appendln("ifne " + ir.label.toString());
+            appendln("ifne L" + ir.label.labelId);
         }
     }
 
     public void visit(InstLabel ir) {
-        appendln(ir.toString());
+        appendln(ir.toString(), false);
     }
 
     public <R> void visit(InstLiteralAssn<R> ir) {
@@ -241,13 +281,13 @@ public class JVisitor {
         append("ldc ");
         if (ir.literalType.equals(Boolean.class)) {
             Boolean b = (Boolean)ir.value;
-            appendln(b ? "1" : "0");
+            appendln(b ? "1" : "0", false);
         }
         else if (ir.literalType.equals(Character.class)) {
-            appendln("" + Character.getNumericValue((Character)ir.value));
+            appendln("" + Character.getNumericValue((Character)ir.value), false);
         }
         else {
-            appendln(ir.value.toString());
+            appendln(ir.value.toString(), false);
         }
 
         if (type.atomicType == AtomicType.TYPE_STRING) {
@@ -282,12 +322,12 @@ public class JVisitor {
         }
 
         if (type.atomicType == AtomicType.TYPE_STRING) {
-            append("Ljava/lang/String;");
+            append("Ljava/lang/String;", false);
         }
         else {
-            append(type.toJString());
+            append(type.toJString(), false);
         }
-        appendln(")V");
+        appendln(")V", false);
     }
 
     public void visit(InstReturn ir) {
