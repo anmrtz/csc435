@@ -11,8 +11,8 @@ for f in ./*.ul; do
     echo "----------------------------------------------"
     b=${f%.*}
     java -cp "../../antlr3.jar:../../build" Compiler $f > $b.ir
-    ../codegen --file=$b.ir > $b.j
-    jasmin $b.j
+    ../codegen --file=$b.ir > $b.ref.j
+    jasmin $b.ref.j
     if [ $? -eq 0 ]
     then
         echo -e "${GREEN}PASS - No type errors detected in valid file${NC}"

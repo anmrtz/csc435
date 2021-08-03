@@ -24,23 +24,23 @@ public class Compiler {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ulParser parser = new ulParser(tokens);
 
+		String baseFilename = args[0];
+		baseFilename = baseFilename.substring(baseFilename.lastIndexOf('/')+1,baseFilename.lastIndexOf('.'));
+
 		try {
 			Program p = parser.program();
-		
-			//PrintVisitor pv = new PrintVisitor();
-			//p.accept(pv);
 
 			TypeCheckVisitor tv = new TypeCheckVisitor();
 			p.accept(tv);
 
-			String path = args[0];
-			IRVisitor ir = new IRVisitor(path.substring(path.lastIndexOf('/')+1,path.lastIndexOf('.'))); 
+			IRVisitor ir = new IRVisitor(baseFilename); 
 			p.accept(ir);
 			IRProgram irp = ir.program;
-			//System.out.println(irp.toString());
 
 			JVisitor jv = new JVisitor(irp);
-			System.out.println(jv.getJCode());
+			PrintWriter jasminFile = new PrintWriter(baseFilename + ".j");
+			jasminFile.write(jv.getJCode());
+			jasminFile.close();
 		}
 		catch (SemanticException e) {
 			System.out.println(e);

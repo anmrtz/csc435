@@ -1,7 +1,6 @@
 package codegen;
 
 import ir.*;
-import ir.TempVar.TempType;
 import type.*;
 import type.Type.AtomicType;
 import ast.ExprBinaryOp.OpType;
@@ -10,7 +9,7 @@ public class JVisitor {
     private StringBuilder sb = new StringBuilder();
 
     private IRProgram program;
-    private int cmpLabelCount = 0;
+    private int cmpLabelCount;
 
     private boolean indent = false;
 
@@ -48,7 +47,6 @@ public class JVisitor {
     }
 
     public void visit(IRProgram ir) {
-        appendln(".source " + this.program.name);
         appendln(".class public " + this.program.name);
         appendln(".super java/lang/Object\n");
 
@@ -74,7 +72,7 @@ public class JVisitor {
         appendln("invokenonvirtual java/lang/Object/<init>()V");
         appendln("return");
         untab();
-        appendln(".end method\n");
+        appendln(".end method");
     }
 
     public void visit(IRFunction ir) {
@@ -89,9 +87,10 @@ public class JVisitor {
         tab();
         appendln(".limit locals " + ir.temps.size());
         appendln(".limit stack  16");
-/*
+
+        // Default init locals to null / 0
         for (TempVar temp : ir.temps) {
-            if (temp.tempType != TempType.PARAM) {
+            if (temp.tempType != TempVar.TempType.PARAM) {
                 Type type = temp.varType;
                 // Array or string
                 if ((type instanceof TypeArr) || 
@@ -110,11 +109,37 @@ public class JVisitor {
                 }
             }
         }
-*/
+
         cmpLabelCount = 0;
         for (Instruction inst : ir.instructions) {
             inst.accept(this);;
             append("\n");
+        }
+
+        if (ir.instructions.isEmpty() || 
+            !(ir.instructions.get(ir.instructions.size() - 1) instanceof InstReturn)) {
+            
+            Type retType = ir.returnType;
+   
+            // Array or string
+            if ((retType instanceof TypeArr) || 
+                (retType.atomicType == AtomicType.TYPE_STRING)) {
+                appendln("aconst_null");
+                appendln("areturn");
+            }
+            else if (retType.atomicType == AtomicType.TYPE_FLOAT) {
+                appendln("ldc 0.0");
+                appendln("freturn");
+            }
+            else if (retType.atomicType == AtomicType.TYPE_VOID) {
+                appendln("return");
+                return;
+            }
+            // int, char, bool
+            else {
+                appendln("ldc 0");
+                appendln("ireturn");
+            }
         }
 
         untab();
@@ -128,8 +153,30 @@ public class JVisitor {
         appendln("aload " + ir.arr.id);
         appendln("iload " + ir.arrIdx.id);
 
-        appendln("iaload");
-        appendln("istore " + ir.dest.id);
+        Type type = ir.dest.varType;
+
+        // Array or string
+        if ((type instanceof TypeArr) || 
+            (type.atomicType == AtomicType.TYPE_STRING)) {
+            appendln("aaload");
+            appendln("astore " + ir.dest.id);
+        }
+        else if (type.atomicType == AtomicType.TYPE_FLOAT) {
+            appendln("faload");
+            appendln("fstore " + ir.dest.id);
+        }
+        else if (type.atomicType == AtomicType.TYPE_INT) {
+            appendln("iaload");
+            appendln("istore " + ir.dest.id);
+        }
+        else if (type.atomicType == AtomicType.TYPE_CHAR) {
+            appendln("caload");
+            appendln("istore " + ir.dest.id);
+        }
+        else if (type.atomicType == AtomicType.TYPE_BOOL) {
+            appendln("baload");
+            appendln("istore " + ir.dest.id);
+        }
     }
 
     public void visit(InstArrAssn ir) {
@@ -138,7 +185,22 @@ public class JVisitor {
 
         ir.value.accept(this);
 
-        appendln("iastore");
+        Type type = ir.destArr.varType;
+        if (type.atomicType == AtomicType.TYPE_STRING) {
+            appendln("aastore");
+        }
+        else if (type.atomicType == AtomicType.TYPE_FLOAT) {
+            appendln("fastore");
+        }
+        else if (type.atomicType == AtomicType.TYPE_INT) {
+            appendln("iastore");
+        }
+        else if (type.atomicType == AtomicType.TYPE_CHAR) {
+            appendln("castore");
+        }
+        else if (type.atomicType == AtomicType.TYPE_BOOL) {
+            appendln("bastore");
+        }
     }
 
     public void visit(InstArrInit ir) {
@@ -161,6 +223,8 @@ public class JVisitor {
         else if (type.atomicType == AtomicType.TYPE_BOOL) {
             appendln("newarray boolean");
         }
+
+        appendln("astore " + ir.arr.id);
     }
 
     public void visit(InstAssign ir) {
@@ -306,7 +370,8 @@ public class JVisitor {
             appendln(b ? "1" : "0", false);
         }
         else if (ir.literalType.equals(Character.class)) {
-            appendln("" + Character.getNumericValue((Character)ir.value), false);
+            Character c = (Character)ir.value;
+            appendln("" + (int)(c.charValue()), false);
         }
         else {
             appendln(ir.value.toString(), false);

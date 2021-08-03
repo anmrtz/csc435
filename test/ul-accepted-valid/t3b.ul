@@ -1,9 +1,9 @@
 void main() {
     int[1] intArr;
-    float[1] floatArr;
-    char[1] charArr;
-    string[1] stringArr;
-    boolean[1] booleanArr;
+    float[2] floatArr;
+    char[3] charArr;
+    string[4] stringArr;
+    boolean[5] booleanArr;
 
     intArr[0] = 3;
     floatArr[1] = 3.14;

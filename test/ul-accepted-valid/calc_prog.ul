@@ -80,6 +80,9 @@ void main() {
     print "Is less than: ";
     println isLessThan(i,j);
 
+    print "Is greater than or equal to: ";
+    println isLessThan(j,i);
+
     print "Is 2 equal to 7: ";
     println isSeven(2);
 

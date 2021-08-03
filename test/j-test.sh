@@ -18,6 +18,7 @@ for f in ./*.ul; do
     else
         echo -e "${RED}FAIL - Type error found in valid file or file not accepted${NC}"
     fi
+    java $(basename $b)
     echo -e "----------------------------------------------\n"
 done
 )
